@@ -55,7 +55,7 @@
     "socket.io-client": "^4.7.5",
     "svg.js": "^2.7.1",
     "swr": "^2.2.5",
-    "three": "^0.164.1",
+    "three": "^0.170.0",
     "three-stdlib": "^2.30.0",
     "use-interval": "^1.4.0",
     "uuid": "^9.0.1",
