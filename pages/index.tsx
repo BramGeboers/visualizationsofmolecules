@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Canvas, useLoader } from "@react-three/fiber";
-import { TextureLoader, PlaneGeometry, Mesh, SphereGeometry } from "three";
+import { TextureLoader, PlaneGeometry, Mesh } from "three";
 import { OrbitControls, Text } from "@react-three/drei";
 
 // Function to perform inversion around point P with radius 1

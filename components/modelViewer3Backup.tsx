@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls, Text } from "@react-three/drei";
 import { Atom, Bond } from "@/utils/parseSDF";
@@ -253,13 +253,12 @@ const PointSphereTransformed: React.FC<{
   );
 };
 
-function AtomModel({
-  position,
-  symbol,
-}: {
+const AtomModel: React.FC<{
   position: [number, number, number];
   symbol: string;
-}) {
+  L: number;
+  P: { real: number; imag: number; z: number };
+}> = ({ position, symbol, L, P }) => {
   // Atomic radii in angstroms (1 angstrom = 0.1 nm)
   const atomicRadii: { [key: string]: number } = {
     H: 0.25, // Hydrogen
@@ -314,35 +313,72 @@ function AtomModel({
   const radius = atomicRadii[symbol] || 0.8; // Default to 0.8 if symbol is not in the dictionary
   const color = atomColors[symbol] || "gray"; // Default to gray if symbol is not in the dictionary
 
-  // Scaling factor to reduce atom sizes for better bond visibility
-  const scaleFactor = 0.6;
+  // Apply Möbius scaling transformation
+  const transformed = mobiusScalingTransform(
+    { real: position[0], imag: position[1], z: position[2] },
+    P,
+    L
+  );
+
+  // Calculate distance between atom position and P (center of transformation)
+  const dist = distance(
+    { real: position[0], imag: position[1], z: position[2] },
+    P
+  );
+
+  // For default scaling, avoid applying exponential scaling
+  let scalingFactor = 1;
+  if (dist !== 0) {
+    // Apply exponential scaling only when not at the center
+    scalingFactor = 1 + (L - 1) * Math.exp(-dist * 0.5) * 4;
+  }
+
+  // Apply the scaling factor to the atomic radius
+  //   const size = radius * scalingFactor; // Scale based on the distance and radius
+  // Apply the scaling factor to the atomic radius
+  const size = radius * 0.3 * scalingFactor; // Scale the radius directly instead of using scale property
 
   return (
-    <mesh position={position}>
-      <sphereGeometry args={[radius * scaleFactor, 32, 32]} />
+    <mesh position={[transformed.real, transformed.imag, transformed.z]}>
+      <sphereGeometry args={[size, 32, 32]} />{" "}
+      {/* Directly scale the geometry */}
       <meshStandardMaterial color={color} />
     </mesh>
   );
-}
-
+};
 // BondProps now includes the bond type (single, double, triple, etc.)
 interface BondProps {
   start: [number, number, number];
   end: [number, number, number];
   type: number; // 1 for single, 2 for double, 3 for triple, etc.
+  L: number; // Add L property
+  P: { real: number; imag: number; z: number }; // Add P property
 }
 
-function BondModel({ start, end, type }: BondProps) {
+const BondModel: React.FC<BondProps> = ({ start, end, type, L, P }) => {
+  // Apply Möbius transformation to both start and end positions
+  const transformedStart = mobiusScalingTransform(
+    { real: start[0], imag: start[1], z: start[2] },
+    P,
+    L
+  );
+  const transformedEnd = mobiusScalingTransform(
+    { real: end[0], imag: end[1], z: end[2] },
+    P,
+    L
+  );
+
+  // Midpoint and direction based on transformed positions
   const midPoint: [number, number, number] = [
-    (start[0] + end[0]) / 2,
-    (start[1] + end[1]) / 2,
-    (start[2] + end[2]) / 2,
+    (transformedStart.real + transformedEnd.real) / 2,
+    (transformedStart.imag + transformedEnd.imag) / 2,
+    (transformedStart.z + transformedEnd.z) / 2,
   ];
 
   const direction = new THREE.Vector3(
-    end[0] - start[0],
-    end[1] - start[1],
-    end[2] - start[2]
+    transformedEnd.real - transformedStart.real,
+    transformedEnd.imag - transformedStart.imag,
+    transformedEnd.z - transformedStart.z
   );
   const length = direction.length();
   direction.normalize(); // Normalize the direction vector
@@ -360,6 +396,7 @@ function BondModel({ start, end, type }: BondProps) {
 
   const bondGeometries = [];
 
+  // Handle different bond types (single, double, triple)
   if (type === 1) {
     // Single bond logic: offset by a small amount in the X-axis
     const offset = offsetDistance; // Single bond offset
@@ -391,12 +428,12 @@ function BondModel({ start, end, type }: BondProps) {
 
         ref.current.scale.set(1, 1, length); // Scale the bond mesh along Z-axis
       }
-    }, [end, midPoint, direction, offset]);
+    }, [transformedStart, transformedEnd, midPoint, direction, offset]);
 
     bondGeometries.push(
       <mesh key={0} ref={ref}>
-        <cylinderGeometry args={[0.05, 0.05, length, 32]} />
-        <meshStandardMaterial color="black" />
+        <cylinderGeometry args={[0.05, 0.05, length, 128]} />
+        <meshStandardMaterial color="white" transparent opacity={0.4} />
       </mesh>
     );
   } else if (type === 2) {
@@ -431,7 +468,7 @@ function BondModel({ start, end, type }: BondProps) {
 
         ref1.current.scale.set(1, 1, length); // Scale the bond mesh
       }
-    }, [end, midPoint, direction, offset1]);
+    }, [transformedStart, transformedEnd, midPoint, direction, offset1]);
 
     bondGeometries.push(
       <mesh key={0} ref={ref1}>
@@ -467,12 +504,12 @@ function BondModel({ start, end, type }: BondProps) {
 
         ref2.current.scale.set(1, 1, length); // Scale the bond mesh
       }
-    }, [end, midPoint, direction, offset2]);
+    }, [transformedStart, transformedEnd, midPoint, direction, offset2]);
 
     bondGeometries.push(
       <mesh key={1} ref={ref2}>
-        <cylinderGeometry args={[0.05, 0.05, length, 32]} />
-        <meshStandardMaterial color="black" />
+        <cylinderGeometry args={[0.05, 0.05, length, 128]} />
+        <meshStandardMaterial color="white" transparent opacity={0.4} />
       </mesh>
     );
   } else if (type === 3) {
@@ -507,67 +544,236 @@ function BondModel({ start, end, type }: BondProps) {
 
           ref.current.scale.set(1, 1, length); // Scale the bond mesh along Z-axis
         }
-      }, [end, midPoint, direction, offset]);
+      }, [transformedStart, transformedEnd, midPoint, direction, offset]);
 
       bondGeometries.push(
         <mesh key={i} ref={ref}>
-          <cylinderGeometry args={[0.05, 0.05, length, 32]} />
-          <meshStandardMaterial color="black" />
+          <cylinderGeometry args={[0.05, 0.05, length, 128]} />
+          <meshStandardMaterial color="white" transparent opacity={0.4} />
         </mesh>
       );
     }
   }
 
   return <>{bondGeometries}</>;
-}
+};
 
 export const ModelViewer: React.FC<{ atoms: Atom[]; bonds: Bond[] }> = ({
   atoms,
   bonds,
 }) => {
+  const [L, setL] = useState(1.0);
+  const [xPosition, setXPosition] = useState(0);
+  const [yPosition, setYPosition] = useState(0);
+  const [zPosition, setZPosition] = useState(0); // New Z position state
+  const [pos1, setPos1] = useState(false);
+  const [pos2, setPos2] = useState(false);
+
+  const [P_x, setP_x] = useState(1); // New state for the x-coordinate of the point P
+  const [P_y, setP_y] = useState(0); // New state for the y-coordinate of the point P
+  const [P_z, setP_z] = useState(0); // New state for the z-coordinate of the point P
+
+  const P = { real: P_x, imag: P_y, z: P_z };
+
+  const handleButton = () => {
+    setPos1(!pos1);
+  };
+
+  const handleButton2 = () => {
+    setPos2(!pos2);
+  };
+  // Define the click handler for the spheres
+  const handleClick = (position: { x: number; y: number; z: number }) => {
+    console.log(
+      `Clicked sphere at position: (${position.x}, ${position.y}, ${position.z})`
+    );
+
+    if (pos1) {
+      setP_x(position.x);
+      setP_y(position.y);
+      setP_z(position.z);
+      setPos1(false);
+      console.log("Updated P:", { P_x, P_y, P_z }); // Add a log to check the updated P
+    }
+
+    if (pos2) {
+      setXPosition(position.x);
+      setYPosition(position.y);
+      setZPosition(position.z);
+      setPos2(false);
+    }
+  };
   return (
-    <Canvas>
-      <ambientLight intensity={0.5} />
-      <pointLight position={[10, 10, 10]} />
-      {/* <axesHelper args={[5]} /> */}
+    <div className="bg-gray-700 w-full h-full">
+      <Canvas>
+        <ambientLight intensity={0.5} />
+        <pointLight position={[10, 10, 10]} />
+        {/* <MobiusPlane L={L} P={P} /> */}
 
-      {/* Axis labels */}
-      {/* <Text position={[6, 0, 0]} fontSize={0.5} color="red">
-        X
-      </Text>
-      <Text position={[0, 6, 0]} fontSize={0.5} color="green">
-        Y
-      </Text> */}
-      {/* <Text position={[0, 0, 6]} fontSize={0.5} color="blue">
-        Z
-      </Text> */}
+        {/* <axesHelper args={[5]} /> */}
 
-      {atoms.map((atom, index) => (
-        <AtomModel
-          key={index}
-          position={[atom.x, atom.y, atom.z]}
-          symbol={atom.symbol}
-        />
-      ))}
+        {/* Axis labels */}
+        {/* <Text position={[6, 0, 0]} fontSize={0.5} color="red">
+          X
+        </Text>
+        <Text position={[0, 6, 0]} fontSize={0.5} color="green">
+          Y
+        </Text>
+        <Text position={[0, 0, 6]} fontSize={0.5} color="blue">
+          Z
+        </Text> */}
 
-      {bonds.map((bond, index) => (
-        <BondModel
-          key={index}
-          start={[
-            atoms[bond.startAtomIndex].x,
-            atoms[bond.startAtomIndex].y,
-            atoms[bond.startAtomIndex].z,
-          ]}
-          end={[
-            atoms[bond.endAtomIndex].x,
-            atoms[bond.endAtomIndex].y,
-            atoms[bond.endAtomIndex].z,
-          ]}
-          type={bond.type} // Type of bond (1, 2, 3, etc.)
-        />
-      ))}
+        {atoms.map((atom, index) => (
+          <AtomModel
+            key={index}
+            position={[atom.x, atom.y, atom.z]}
+            symbol={atom.symbol}
+            L={L} // Replace with the actual value of L
+            P={P} // Replace with the actual value of P
+          />
+        ))}
 
-      <OrbitControls />
-    </Canvas>
+        {bonds.map((bond, index) => (
+          <BondModel
+            key={index}
+            start={[
+              atoms[bond.startAtomIndex].x,
+              atoms[bond.startAtomIndex].y,
+              atoms[bond.startAtomIndex].z,
+            ]}
+            end={[
+              atoms[bond.endAtomIndex].x,
+              atoms[bond.endAtomIndex].y,
+              atoms[bond.endAtomIndex].z,
+            ]}
+            L={L} // Replace with the actual value of L
+            P={P} // Replace with the actual value of P
+            type={bond.type} // Type of bond (1, 2, 3, etc.)
+          />
+        ))}
+
+        <OrbitControls />
+      </Canvas>
+
+      <div className="w-[20%] fixed right-0 top-0 flex flex-col gap-4 bg-gray-900 h-[100vh] text-white p-4">
+        <div className="bg-black p-4 flex items-center rounded-xl  flex-col mb-6">
+          <span className="mb-2">Zoom Factor: {L.toFixed(2)}</span>
+          <input
+            className="w-[300px] mr-4"
+            type="range"
+            min="-3"
+            max="3"
+            step="0.01"
+            value={L}
+            onChange={(e) => setL(parseFloat(e.target.value))}
+          />
+        </div>
+        <div className="bg-black p-4 flex items-center rounded-xl  flex-col ">
+          <span className="mb-2">X Position: {xPosition.toFixed(1)}</span>
+          <input
+            className="w-[300px] mr-4"
+            type="range"
+            min={-5}
+            max={5}
+            step="0.1"
+            value={xPosition}
+            onChange={(e) => setXPosition(parseFloat(e.target.value))}
+          />
+        </div>
+        <div className="bg-black p-4 flex items-center rounded-xl  flex-col ">
+          <span className="mb-2">Y Position: {yPosition.toFixed(1)}</span>
+          <input
+            className="w-[300px] mr-4"
+            type="range"
+            min={-5}
+            max={5}
+            step="0.1"
+            value={yPosition}
+            onChange={(e) => setYPosition(parseFloat(e.target.value))}
+          />
+        </div>
+        <div className="bg-black p-4 flex items-center rounded-xl  flex-col mb-6">
+          <span className="mb-2">Z Position: {zPosition.toFixed(1)}</span>
+          <input
+            className="w-[300px] mr-4"
+            type="range"
+            min={-5}
+            max={5}
+            step="0.1"
+            value={zPosition}
+            onChange={(e) => setZPosition(parseFloat(e.target.value))}
+          />
+        </div>
+
+        <div className="bg-black p-4 flex items-center rounded-xl  flex-col mb-6">
+          <button
+            className={
+              pos2
+                ? `w-40 h-9 rounded-lg bg-gray-500`
+                : `w-40 h-9 rounded-lg bg-gray-700`
+            }
+            onClick={handleButton2}
+          >
+            Select Origin
+          </button>
+        </div>
+
+        <div className="bg-black p-4 flex items-center rounded-xl  flex-col ">
+          <span className="mb-2">
+            P.X (Center of Transformation): {P_x.toFixed(1)}
+          </span>
+          <input
+            className="w-[300px] mr-4"
+            type="range"
+            min={-5}
+            max={5}
+            step="0.1"
+            value={P_x}
+            onChange={(e) => setP_x(parseFloat(e.target.value))}
+          />
+        </div>
+        <div className="bg-black p-4 flex items-center rounded-xl  flex-col ">
+          <span className="mb-2">
+            P.Y (Center of Transformation): {P_y.toFixed(1)}
+          </span>
+          <input
+            className="w-[300px] mr-4"
+            type="range"
+            min={-5}
+            max={5}
+            step="0.1"
+            value={P_y}
+            onChange={(e) => setP_y(parseFloat(e.target.value))}
+          />
+        </div>
+        <div className="bg-black p-4 flex items-center rounded-xl  flex-col ">
+          <span className="mb-2">
+            P.Z (Center of Transformation): {P_z.toFixed(1)}
+          </span>
+          <input
+            className="w-[300px] mr-4"
+            type="range"
+            min={-5}
+            max={5}
+            step="0.1"
+            value={P_z}
+            onChange={(e) => setP_z(parseFloat(e.target.value))}
+          />
+        </div>
+
+        <div className="bg-black p-4 flex items-center rounded-xl  flex-col mb-6">
+          <button
+            className={
+              pos1
+                ? `w-40 h-9 rounded-lg bg-gray-500`
+                : `w-40 h-9 rounded-lg bg-gray-700`
+            }
+            onClick={handleButton}
+          >
+            Select P
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
