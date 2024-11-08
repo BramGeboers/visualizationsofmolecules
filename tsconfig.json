@@ -33,9 +33,9 @@
     "**/*.tsx",
     "**/*.ttf",
     "**/**/.ttf",
-    "src/components/game/sprites/GamepadController.jsx",
-    "src/components/game/canvas/plants/map.jsx",
-    "src/components/game/canvas/Experience.tsx",
+    "components/game/sprites/GamepadController.jsx",
+    "components/game/canvas/plants/map.jsx",
+    "components/game/canvas/Experience.tsx",
     "./public/*",
     "./public/fonts/*.ttf",
     "./public/fonts/*.js"

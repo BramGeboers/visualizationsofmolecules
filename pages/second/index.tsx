@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { fetchMolecule3D } from "@/utils/fetchmolecule";
 import { parseSDF, Atom, Bond } from "@/utils/parseSDF";
-import { ModelViewer } from "@/src/components/modelViewer3Backup";
+import { ModelViewer } from "@/components/modelViewer3Backup";
 
 const Home: React.FC = () => {
   const [atoms, setAtoms] = useState<Atom[]>([]);
