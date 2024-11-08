@@ -1,0 +1,11 @@
+Model Information:
+* title:	Low Poly Cactus
+* source:	https://sketchfab.com/3d-models/low-poly-cactus-ed610befd1694e01a918971b554eff1f
+* author:	Ar41k (https://sketchfab.com/ar41k)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Low Poly Cactus" (https://sketchfab.com/3d-models/low-poly-cactus-ed610befd1694e01a918971b554eff1f) by Ar41k (https://sketchfab.com/ar41k) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
