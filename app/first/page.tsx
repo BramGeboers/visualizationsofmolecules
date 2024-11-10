@@ -138,7 +138,7 @@ const Index: React.FC = () => {
 
         <OrbitControls />
       </Canvas>
-      <div className="fixed bottom-4 p-2 rounded-lg flex justify-center w-full text-[#111111]">
+      <div className="fixed bottom-0 p-2 rounded-lg flex justify-center w-full text-[#111111]">
         <div className="flex flex-row gap-12">
           <div className="bg-[#DBD8D5] p-4 flex flex-col rounded-md mb-12 items-center ">
             <div className="flex justify-between w-full max-w-[300px]">

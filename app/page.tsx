@@ -8,7 +8,7 @@ import image1 from "../public/logo.svg";
 // Main Index component to render both the original and transformed images side-by-side
 const Index: React.FC = () => {
   return (
-    <div className="bg-[rgb(36,36,36)] w-[100vw] h-[100vh] pt-20 flex flex-col items-center justify-center text-[#DBD8D5]">
+    <div className="bg-[rgb(36,36,36)] w-full h-full min-h-[100vh] pt-20 flex flex-col items-center justify-center text-[#DBD8D5]">
       <Navbar />
       <div className="flex flex-row justify-between w-full pl-12 font-medium">
         <p className="max-w-[300px] text-lg">

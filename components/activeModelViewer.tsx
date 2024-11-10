@@ -440,7 +440,7 @@ export const ModelViewer: React.FC<{
       </div>
 
       <div
-        className={`w-[400px] overflow-auto fixed right-0 top-0 flex flex-col justify-center gap-4 bg-[#242424] border-l-[1px] border-[#DBD8D5] text-[#111111] h-[100vh] p-4  transition-all duration-300 ${
+        className={`w-[400px] min-w-[300px] overflow-auto fixed right-0 top-0 flex flex-col justify-start gap-4 bg-[#242424] border-l border-[#DBD8D5] text-[#111111] h-[100vh] p-4 transition-all duration-300 ${
           navActive ? "translate-x-full" : "translate-x-0"
         }`}
       >
