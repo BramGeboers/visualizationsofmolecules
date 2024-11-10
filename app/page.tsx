@@ -17,7 +17,7 @@ const Index: React.FC = () => {
           and scaling in Three.js and React to interactively visualize and
           analyze 2D molecular structures.
         </p>
-        <div className="flex flex-row border-b-[1px] border-[#DBD8D5] w-full lg:w-[65vw] justify-between items-start pr-10 px-6 lg:px-0">
+        <div className="flex flex-row border-b-[1px] pt-20 border-[#DBD8D5] w-full lg:w-[65vw] justify-between items-start pr-10 px-6 lg:px-0">
           <h1 className="text-[50px] sm:text-[70px] md:text-[90px] lg:text-[120px] font-semibold leading-[50px] sm:leading-[70px] md:leading-[90px] lg:leading-[100px] mb-6 lg:mb-0">
             View a <br />
             <span className="text-[#4AC585]">Molecule </span> <br />
@@ -39,7 +39,7 @@ const Index: React.FC = () => {
         </p>
       </div>
 
-      <div className="flex flex-col items-center gap-6 mt-20 mx-4 lg:mr-16 w-full lg:items-end text-2xl lg:text-4xl">
+      <div className="flex flex-col items-center gap-6 mt-20 pb-30 mx-4 lg:mr-16 w-full lg:items-end text-2xl lg:text-4xl">
         <div className="flex flex-row justify-between gap-4 w-[80%] sm:w-[600px] lg:w-[700px]">
           <p className="flex flex-row">
             <span className="mr-8 lg:block hidden">01. </span> 2D Transformation
