@@ -43,7 +43,7 @@ const Home: React.FC = () => {
   return (
     <div className="w-full h-[100vh] bg-[#242424] text-[#DBD8D5]">
       <Navbar />
-      <div className="flex absolute z-50 left-[50vw] h-[56px] pt-4 items-center -translate-x-[50%]">
+      <div className="flex absolute z-50 left-[50vw] h-[56px] lg:pt-4 pt-28 items-center -translate-x-[50%]">
         <input
           className="p-1 w-[230px] text-center bg-[#242424] border-[##DBD8D5] border-2 rounded-md mr-4 bg-opacity-0 "
           type="text"

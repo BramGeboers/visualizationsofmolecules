@@ -115,10 +115,10 @@ const Index: React.FC = () => {
   const P = { real: xPosition, imag: yPosition };
 
   return (
-    <div className="bg-[#242424] w-full h-full">
+    <div className="bg-[#242424] w-full min-h-[100vh]">
       <Navbar />
       <Canvas
-        style={{ height: "100vh", width: "100%" }}
+        style={{ height: "80vh", width: "100%" }}
         camera={{ position: [0, 0, 10] }}
         shadows
       >
@@ -139,7 +139,7 @@ const Index: React.FC = () => {
         <OrbitControls />
       </Canvas>
       <div className="fixed bottom-0 p-2 rounded-lg flex justify-center w-full text-[#111111]">
-        <div className="flex flex-row gap-12">
+        <div className="flex lg:flex-row flex-col lg:gap-12 gap-2">
           <div className="bg-[#DBD8D5] p-4 flex flex-col rounded-md mb-12 items-center ">
             <div className="flex justify-between w-full max-w-[300px]">
               <span className="mb-2 flex between">Zoom</span>

@@ -421,7 +421,9 @@ export const ModelViewer: React.FC<{
 
       <button
         className={`w-8 h-8 fixed top-4 right-4 z-50  bg-[#4AC585] rounded-md cursor-pointer flex items-center justify-center transition-all duration-300 ${
-          navActive ? "-translate-x-0" : "-translate-x-[400px]"
+          navActive
+            ? "-translate-x-0"
+            : "lg:-translate-x-[400px] -translate-x-[300px]"
         }`}
         onClick={toggleNav}
       >
@@ -440,7 +442,7 @@ export const ModelViewer: React.FC<{
       </div>
 
       <div
-        className={`w-[400px] min-w-[300px] overflow-auto fixed right-0 top-0 flex flex-col justify-start gap-4 bg-[#242424] border-l border-[#DBD8D5] text-[#111111] h-[100vh] p-4 transition-all duration-300 ${
+        className={`lg:w-[400px] w-[300px] min-w-[300px] overflow-auto fixed z-50 right-0 top-0 flex flex-col justify-start gap-4 bg-[#242424] border-l border-[#DBD8D5] text-[#111111] h-[100vh] p-4 transition-all duration-300 ${
           navActive ? "translate-x-full" : "translate-x-0"
         }`}
       >
@@ -450,7 +452,7 @@ export const ModelViewer: React.FC<{
             <span>{L.toFixed(2)}</span>
           </div>
           <input
-            className="w-[300px] mb-2"
+            className="lg:w-[300px] w-[240px] mb-2"
             type="range"
             min="-3"
             max="3"
@@ -491,7 +493,7 @@ export const ModelViewer: React.FC<{
                 <span>{value.toFixed(1)}</span>
               </div>
               <input
-                className="w-[300px]"
+                className="lg:w-[300px] w-[240px]"
                 type="range"
                 min="-3"
                 max="3"
@@ -546,7 +548,7 @@ export const ModelViewer: React.FC<{
                 <span>{value.toFixed(1)}</span>
               </div>
               <input
-                className="w-[300px]"
+                className="lg:w-[300px] w-[240px]"
                 type="range"
                 min="-3"
                 max="3"
