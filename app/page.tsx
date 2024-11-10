@@ -39,7 +39,7 @@ const Index: React.FC = () => {
         </p>
       </div>
 
-      <div className="flex flex-col items-center gap-6 mt-20 pb-30 mx-4 lg:mr-16 w-full lg:items-end text-2xl lg:text-4xl">
+      <div className="flex flex-col items-center gap-6 mt-20 mb-20 mx-4 lg:mr-16 w-full lg:items-end text-2xl lg:text-4xl">
         <div className="flex flex-row justify-between gap-4 w-[80%] sm:w-[600px] lg:w-[700px]">
           <p className="flex flex-row">
             <span className="mr-8 lg:block hidden">01. </span> 2D Transformation
