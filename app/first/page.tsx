@@ -140,7 +140,7 @@ const Index: React.FC = () => {
       </Canvas>
       <div className="fixed bottom-0 p-2 rounded-lg flex justify-center w-full text-[#111111]">
         <div className="flex lg:flex-row flex-col lg:gap-12 gap-2">
-          <div className="bg-[#DBD8D5] p-4 flex flex-col rounded-md mb-12 items-center ">
+          <div className="bg-[#DBD8D5] p-4 flex flex-col rounded-md lg:mb-12 mb-3 items-center ">
             <div className="flex justify-between w-full max-w-[300px]">
               <span className="mb-2 flex between">Zoom</span>
               <span>{L.toFixed(2)}</span>
@@ -174,7 +174,7 @@ const Index: React.FC = () => {
               }
             `}</style>
           </div>
-          <div className="bg-[#DBD8D5] p-4 flex flex-col rounded-md mb-12 items-center ">
+          <div className="bg-[#DBD8D5] p-4 flex flex-col rounded-md lg:mb-12 mb-3 items-center ">
             <div className="flex justify-between w-full max-w-[300px]">
               <span className="mb-2 flex between">X</span>
               <span>{xPosition.toFixed(1)}</span>
@@ -208,7 +208,7 @@ const Index: React.FC = () => {
               }
             `}</style>
           </div>
-          <div className="bg-[#DBD8D5] p-4 flex flex-col rounded-md mb-12 items-center ">
+          <div className="bg-[#DBD8D5] p-4 flex flex-col rounded-md lg:mb-12 mb-4 items-center ">
             <div className="flex justify-between w-full max-w-[300px]">
               <span className="mb-2 flex between">Zoom</span>
               <span>{yPosition.toFixed(1)}</span>
