@@ -4,6 +4,7 @@ import Link from "next/link";
 import { IoIosArrowRoundForward } from "react-icons/io";
 import Image from "next/image";
 import image1 from "../public/logo.svg";
+import Head from "next/head";
 
 // Main Index component to render both the original and transformed images side-by-side
 const Index: React.FC = () => {
