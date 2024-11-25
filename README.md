@@ -22,7 +22,7 @@ MoleculeViewer is a cutting-edge 3D web application designed for fetching and vi
 To set up the application locally, follow these steps:  
 
 ```bash
-git clone https://github.com/yourusername/MoleculeViewer.git
+git clone https://github.com/BramGeboers/MoleculeViewer.git
 cd MoleculeViewer
 npm install
 npm run dev
