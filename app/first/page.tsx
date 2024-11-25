@@ -210,7 +210,7 @@ const Index: React.FC = () => {
           </div>
           <div className="bg-[#DBD8D5] p-4 flex flex-col rounded-md lg:mb-12 mb-4 items-center ">
             <div className="flex justify-between w-full max-w-[300px]">
-              <span className="mb-2 flex between">Zoom</span>
+              <span className="mb-2 flex between">Y</span>
               <span>{yPosition.toFixed(1)}</span>
             </div>
             <input
