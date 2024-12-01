@@ -176,38 +176,6 @@ const PointSphere: React.FC<{
   );
 };
 
-const CameraController: React.FC<{
-  P: { real: number; imag: number; z: number };
-  L: number;
-}> = ({ P, L }) => {
-  const { camera } = useThree();
-
-  // Function to apply the Möbius scaling transformation to P
-  const mobiusScalingTransform = (
-    P: { real: number; imag: number; z: number },
-    L: number
-  ) => {
-    const firstInversion = invert(P, P); // Invert P
-    const scaled = relativeScale(firstInversion, P, L); // Scale the inverted point
-    return invert(scaled, P); // Invert again
-  };
-
-  useEffect(() => {
-    // Apply the Möbius scaling transformation to P
-    const transformedP = mobiusScalingTransform(P, L);
-
-    // Set the camera position to follow the transformed P
-    camera.position.set(
-      transformedP.real,
-      transformedP.imag,
-      transformedP.z + 5
-    ); // Adjust the offset for view
-    camera.lookAt(transformedP.real, transformedP.imag, transformedP.z); // Make the camera look at the transformed P
-  }, [P, L, camera]); // Re-run whenever P or L changes
-
-  return null; // This component doesn't render anything visible
-};
-
 const PointSphereTransformed: React.FC<{
   x: number;
   y: number;
@@ -322,7 +290,6 @@ const Index: React.FC = () => {
           shadows
         >
           {/* Add the CameraController to update the camera */}
-          <CameraController P={P} L={L} />
           <ambientLight intensity={0.25} />
           <directionalLight
             position={[40, 40, 40]}

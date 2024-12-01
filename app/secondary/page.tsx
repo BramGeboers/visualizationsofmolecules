@@ -183,7 +183,7 @@ const CameraController: React.FC<{
   const { camera } = useThree();
 
   // Function to apply the Möbius scaling transformation to P
-  const mobiusScalingTransform = (
+const mobiusScalingTransform = (
     P: { real: number; imag: number; z: number },
     L: number
   ) => {
