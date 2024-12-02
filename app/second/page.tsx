@@ -227,22 +227,6 @@ const PointSphereTransformed: React.FC<{
   // Determine if the current point is the same as P, and if so, apply maximum scaling
   const scalingFactor = 1 + 40 * (L - 1) * Math.exp(-dist * 0.5);
   const size = 1 * scalingFactor;
-  console.log(
-    "Dist: ",
-    dist,
-    "Color: ",
-    color,
-    "Scalingfactor: ",
-    scalingFactor,
-    "X: ",
-    x,
-    "Y: ",
-    y,
-    "Z: ",
-    z,
-    "Size: ",
-    size
-  );
 
   return (
     <mesh

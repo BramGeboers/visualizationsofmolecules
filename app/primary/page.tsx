@@ -134,7 +134,7 @@ const TransformedPointSphere: React.FC<{
 // Main Index component to render both the original and transformed images side-by-side
 const Index: React.FC = () => {
   const [L, setL] = useState(0);
-  const [xPosition, setXPosition] = useState(0);
+  const [xPosition, setXPosition] = useState(1.5);
   const [yPosition, setYPosition] = useState(0);
 
   const P = { real: xPosition, imag: yPosition };

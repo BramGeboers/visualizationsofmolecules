@@ -18,7 +18,9 @@
     "react": "^18",
     "react-dom": "^18",
     "react-icons": "^5.3.0",
-    "three": "^0.170.0"
+    "three": "^0.170.0",
+    "three-subdivide": "^1.1.5",
+    "three-subdivision-modifier": "^1.0.5"
   },
   "devDependencies": {
     "@types/node": "^20",
