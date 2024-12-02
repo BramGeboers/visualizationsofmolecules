@@ -42,7 +42,7 @@ function distance(
 ) {
   return Math.sqrt((z.x - P.x) ** 2 + (z.y - P.y) ** 2 + (z.z - P.z) ** 2);
 }
-  
+
 // Möbius Scaling Transformation in 3D with distance-based scaling
 function mobiusScalingTransform(
   z: { x: number; y: number; z: number },
@@ -55,17 +55,68 @@ function mobiusScalingTransform(
 }
 
 const MobiusSphere: React.FC<{
-  radius: number;
   segments: number;
   center: Array<number>;
   P: { x: number; y: number; z: number };
   L: number;
-  color: string; // Base color prompt
-}> = ({ radius, segments, center, P, L, color }) => {
+  symbol: string; // Base color prompt
+  onClick: () => void;
+}> = ({ segments, center, P, L, symbol, onClick }) => {
   const sphereRef = useRef<THREE.Mesh>(null);
 
   // Destructure center for convenience
   const [centerX, centerY, centerZ] = center;
+
+  const atomicRadii: { [key: string]: number } = {
+    H: 0.25, // Hydrogen
+    He: 0.31, // Helium
+    Li: 1.52, // Lithium
+    Be: 1.12, // Beryllium
+    B: 0.87, // Boron
+    C: 0.77, // Carbon
+    N: 0.75, // Nitrogen
+    O: 0.73, // Oxygen
+    F: 0.64, // Fluorine
+    Ne: 0.38, // Neon
+    Na: 1.54, // Sodium
+    Mg: 1.36, // Magnesium
+    Al: 1.18, // Aluminum
+    Si: 1.11, // Silicon
+    P: 1.07, // Phosphorus
+    S: 1.02, // Sulfur
+    Cl: 0.99, // Chlorine
+    Ar: 0.71, // Argon
+    K: 2.03, // Potassium
+    Ca: 1.97, // Calcium
+    // Add more elements as needed...
+  };
+
+  const atomColors: { [key: string]: string } = {
+    H: "white", // Hydrogen
+    He: "lightgray", // Helium
+    Li: "gray", // Lithium
+    Be: "gray", // Beryllium
+    B: "brown", // Boron
+    C: "gray", // Carbon
+    N: "blue", // Nitrogen
+    O: "red", // Oxygen
+    F: "green", // Fluorine
+    Ne: "lightblue", // Neon
+    Na: "lightblue", // Sodium
+    Mg: "green", // Magnesium
+    Al: "gray", // Aluminum
+    Si: "gray", // Silicon
+    P: "orange", // Phosphorus
+    S: "yellow", // Sulfur
+    Cl: "green", // Chlorine
+    Ar: "lightblue", // Argon
+    K: "purple", // Potassium
+    Ca: "violet", // Calcium
+    // Add more colors as needed...
+  };
+
+  const radius = 0.5 * atomicRadii[symbol] || 0.8; // Default to 0.8 if symbol is not in the dictionary
+  const color = atomColors[symbol] || "gray"; // Default to gray if symbol is not in the dictionary
 
   // Generate vertices and apply Möbius transformations
   const { vertices, uvs, indices } = useMemo(() => {
@@ -123,28 +174,19 @@ const MobiusSphere: React.FC<{
   geometry.setIndex(indices);
   geometry.computeVertexNormals();
 
+  const colorInstance = new THREE.Color(color);
   // Generate procedural texture
-  const texture = useMemo(() => {
-    const size = 128; // Texture size
-    const data = new Uint8Array(size * size * 3); // RGB format
-    const colorInstance = new THREE.Color(color);
-
-    for (let i = 0; i < size * size; i++) {
-      const stride = i * 3;
-      colorInstance.offsetHSL(0.01, 0, 0); // Add variation in hue for gradient
-      data[stride] = colorInstance.r * 255; // Red channel
-      data[stride + 1] = colorInstance.g * 255; // Green channel
-      data[stride + 2] = colorInstance.b * 255; // Blue channel
-    }
-
-    const texture = new THREE.DataTexture(data, size, size, THREE.RGBFormat);
-    texture.needsUpdate = true;
-    return texture;
-  }, [color]);
+  // Apply the color to the material
+  const material = new THREE.MeshStandardMaterial({
+    color: colorInstance,
+    emissive: new THREE.Color(color).multiplyScalar(0.2), // Slightly emit light to brighten up
+    metalness: 0.6, // Makes the material look more metallic
+    roughness: 0.5, // Controls how shiny the surface is (lower means shinier)
+  });
 
   return (
-    <mesh ref={sphereRef} geometry={geometry}>
-      <meshStandardMaterial map={texture} />
+    <mesh onClick={onClick} ref={sphereRef} geometry={geometry}>
+      <primitive object={material} />
     </mesh>
   );
 };
@@ -465,9 +507,10 @@ export const ModelViewer: React.FC<{
               // symbol={atom.symbol}
               L={L} // Replace with the actual value of L
               P={P} // Replace with the actual value of P
-              radius={0.3}
-              segments={32}
-              color={"blue"} // onClick={() => handleClick({ x: atom.x, y: atom.y, z: atom.z })}
+              segments={128}
+              symbol={atom.symbol}
+              onClick={() => handleClick({ x: atom.x, y: atom.y, z: atom.z })}
+              // onClick={() => handleClick({ x: atom.x, y: atom.y, z: atom.z })}
             />
           ))}
           {bonds.map((bond, index) => (

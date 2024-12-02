@@ -88,8 +88,7 @@ const Circle: React.FC<{
     const transformedPoint = mobiusScalingTransform(originalPoint, P, L);
     return new THREE.Vector3(
       transformedPoint.real, // x after transformation
-      transformedPoint.imag, // y after transformation
-      0 // z = 0 for a 2D circle
+      transformedPoint.imag // y after transformation
     );
   });
 
@@ -158,7 +157,7 @@ const Index: React.FC = () => {
           color="blue"
         />
         <Circle
-          radius={1}
+          radius={radius}
           segments={1024}
           center={[3, 0]}
           L={L}

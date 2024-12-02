@@ -103,7 +103,7 @@ const MobiusSphere: React.FC<{
   center: Array<number>;
   P: { x: number; y: number; z: number };
   L: number;
-  color: string; // Base color prompt
+  color: string; // Base color prompt (e.g., "blue", "red", "#FF0000")
 }> = ({ radius, segments, center, P, L, color }) => {
   const sphereRef = useRef<THREE.Mesh>(null);
 
@@ -166,28 +166,18 @@ const MobiusSphere: React.FC<{
   geometry.setIndex(indices);
   geometry.computeVertexNormals();
 
-  // Generate procedural texture
-  const texture = useMemo(() => {
-    const size = 128; // Texture size
-    const data = new Uint8Array(size * size * 3); // RGB format
-    const colorInstance = new THREE.Color(color);
+  // Use the color prop directly (e.g., "blue" or "#FF0000")
+  const colorInstance = new THREE.Color(color);
 
-    for (let i = 0; i < size * size; i++) {
-      const stride = i * 3;
-      colorInstance.offsetHSL(0.01, 0, 0); // Add variation in hue for gradient
-      data[stride] = colorInstance.r * 255; // Red channel
-      data[stride + 1] = colorInstance.g * 255; // Green channel
-      data[stride + 2] = colorInstance.b * 255; // Blue channel
-    }
-
-    const texture = new THREE.DataTexture(data, size, size, THREE.RGBFormat);
-    texture.needsUpdate = true;
-    return texture;
-  }, [color]);
+  // Apply the color to the material
+  const material = new THREE.MeshStandardMaterial({
+    color: colorInstance,
+    emissive: new THREE.Color(color), // Slightly emit light to brighten up
+  });
 
   return (
     <mesh ref={sphereRef} geometry={geometry}>
-      <meshStandardMaterial map={texture} />
+      <primitive object={material} />
     </mesh>
   );
 };
@@ -218,7 +208,7 @@ const Index: React.FC = () => {
   const P = { x: xPosition, y: yPosition, z: zPosition };
 
   const radius = 1; // Radius of the blue circle
-  const segments = 30; // Number of spheres on the circle
+  const segments = 10; // Number of spheres on the circle
 
   return (
     <div className="bg-[#242424] w-full min-h-[100vh]">
@@ -235,20 +225,18 @@ const Index: React.FC = () => {
           P={P}
           color="blue"
         />
-
-        <directionalLight position={[5, 5, 5]} intensity={1} />
-
+        <ambientLight intensity={0.5} /> {/* Global ambient light */}
+        <directionalLight position={[40, 40, 40]} intensity={1} />
+        {/* Main light source */}
         <PointSphere x={xPosition} y={yPosition} z={zPosition} />
-
         <MobiusSphere
           radius={1}
-          segments={20}
+          segments={50}
           center={[0, 0, 0]}
           P={P}
           L={L}
-          color={"blue"}
+          color={"red"}
         />
-
         {/* Generate spheres along the blue circle's radius */}
         {/* {Array.from({ length: segments }).map((_, i) => {
           const phi = (i / segments) * Math.PI; // Polar angle
@@ -269,7 +257,6 @@ const Index: React.FC = () => {
             );
           });
         })} */}
-
         <axesHelper />
         <OrbitControls />
       </Canvas>
