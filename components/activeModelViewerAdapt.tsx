@@ -507,7 +507,7 @@ export const ModelViewer: React.FC<{
               // symbol={atom.symbol}
               L={L} // Replace with the actual value of L
               P={P} // Replace with the actual value of P
-              segments={128}
+              segments={80}
               symbol={atom.symbol}
               onClick={() => handleClick({ x: atom.x, y: atom.y, z: atom.z })}
               // onClick={() => handleClick({ x: atom.x, y: atom.y, z: atom.z })}
