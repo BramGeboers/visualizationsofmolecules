@@ -4,199 +4,10 @@ import { Canvas } from "@react-three/fiber";
 import * as THREE from "three";
 import { OrbitControls, Text } from "@react-three/drei";
 import Navbar from "@/components/Navbar";
-
-// Function to perform inversion around point P with radius 1
-function invert(
-  z: { x: number; y: number; z: number },
-  P: { x: number; y: number; z: number }
-) {
-  const dx = z.x - P.x;
-  const dy = z.y - P.y;
-  const dz = z.z - P.z;
-  const denominator = dx ** 2 + dy ** 2 + dz ** 2;
-  return {
-    x: dx / denominator + P.x,
-    y: dy / denominator + P.y,
-    z: dz / denominator + P.z,
-  };
-}
-
-// Function to perform uniform scaling by factor L
-function scale(z: { x: number; y: number; z: number }, L: number) {
-  return {
-    x: L * z.x,
-    y: L * z.y,
-    z: L * z.z, // Apply scaling to the z-axis as well
-  };
-}
-
-// Möbius Scaling Transformation as per the structure provided
-function mobiusScalingTransform(
-  z: { x: number; y: number; z: number },
-  P: { x: number; y: number; z: number },
-  L: number
-) {
-  const firstInversion = invert(z, P);
-  const scaled = scale(firstInversion, Math.pow(2, L)); // Scaling with 2^L
-  return invert(scaled, P);
-}
-
-const Circle: React.FC<{
-  radius: number;
-  segments: number;
-  center: Array<number>;
-  color: string;
-  P: { x: number; y: number; z: number };
-  L: number;
-}> = ({ radius, segments, center, P, L, color }) => {
-  const circleRef = useRef<THREE.Line>(null);
-  const [centerX, centerY, centerZ] = center;
-
-  // Generate transformed sphere points using the Möbius transformation
-  const points = Array.from({ length: segments + 1 }, (_, i) => {
-    const theta = (i / segments) * Math.PI; // θ angle in radians (0 to π)
-    const phi = (i / segments) * Math.PI * 2; // φ angle in radians (0 to 2π)
-
-    // Convert spherical coordinates (θ, φ) to Cartesian coordinates (x, y, z)
-    const originalPoint = {
-      x: centerX + radius * Math.sin(theta) * Math.cos(phi),
-      y: centerY + radius * Math.sin(theta) * Math.sin(phi),
-      z: centerZ + radius * Math.cos(theta),
-    };
-
-    const transformedPoint = mobiusScalingTransform(originalPoint, P, L);
-    return new THREE.Vector3(
-      transformedPoint.x, // x after transformation
-      transformedPoint.y, // y after transformation
-      transformedPoint.z // z after transformation
-    );
-  });
-
-  const geometry = new THREE.BufferGeometry().setFromPoints(points);
-
-  return (
-    <primitive
-      object={
-        new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: color }))
-      }
-      ref={circleRef}
-    />
-  );
-};
-
-const PointSphere: React.FC<{ x: number; y: number; z: number }> = ({
-  x,
-  y,
-  z,
-}) => {
-  return (
-    <mesh position={[x, y, z]}>
-      <sphereGeometry args={[0.1, 32, 32]} />
-      <meshStandardMaterial color={"pink"} />
-    </mesh>
-  );
-};
-
-const MobiusSphere: React.FC<{
-  radius: number;
-  segments: number;
-  center: Array<number>;
-  P: { x: number; y: number; z: number };
-  L: number;
-  color: string; // Base color prompt (e.g., "blue", "red", "#FF0000")
-}> = ({ radius, segments, center, P, L, color }) => {
-  const sphereRef = useRef<THREE.Mesh>(null);
-
-  // Destructure center for convenience
-  const [centerX, centerY, centerZ] = center;
-
-  // Generate vertices and apply Möbius transformations
-  const { vertices, uvs, indices } = useMemo(() => {
-    const vertices: number[] = [];
-    const uvs: number[] = [];
-    const indices: number[] = [];
-
-    for (let i = 0; i <= segments; i++) {
-      const theta = (i / segments) * Math.PI; // θ angle in radians (0 to π)
-      for (let j = 0; j <= segments; j++) {
-        const phi = (j / segments) * 2 * Math.PI; // φ angle in radians (0 to 2π)
-
-        // Original spherical coordinates to Cartesian
-        const originalPoint = {
-          x: centerX + radius * Math.sin(theta) * Math.cos(phi),
-          y: centerY + radius * Math.sin(theta) * Math.sin(phi),
-          z: centerZ + radius * Math.cos(theta),
-        };
-
-        // Apply Möbius scaling transformation
-        const transformedPoint = mobiusScalingTransform(originalPoint, P, L);
-
-        // Add transformed vertices
-        vertices.push(
-          transformedPoint.x,
-          transformedPoint.y,
-          transformedPoint.z
-        );
-
-        // Calculate UV coordinates (for texture mapping)
-        uvs.push(j / segments, i / segments);
-
-        // Create indices for triangles
-        if (i < segments && j < segments) {
-          const a = i * (segments + 1) + j;
-          const b = a + segments + 1;
-
-          // Two triangles per quad
-          indices.push(a, b, a + 1);
-          indices.push(a + 1, b, b + 1);
-        }
-      }
-    }
-
-    return { vertices, uvs, indices };
-  }, [radius, segments, centerX, centerY, centerZ, P, L]);
-
-  // Create geometry
-  const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute(
-    "position",
-    new THREE.Float32BufferAttribute(vertices, 3)
-  );
-  geometry.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
-  geometry.setIndex(indices);
-  geometry.computeVertexNormals();
-
-  // Use the color prop directly (e.g., "blue" or "#FF0000")
-  const colorInstance = new THREE.Color(color);
-
-  // Apply the color to the material
-  const material = new THREE.MeshStandardMaterial({
-    color: colorInstance,
-    emissive: new THREE.Color(color), // Slightly emit light to brighten up
-  });
-
-  return (
-    <mesh ref={sphereRef} geometry={geometry}>
-      <primitive object={material} />
-    </mesh>
-  );
-};
-
-const TransformedPointSphere: React.FC<{
-  x: number;
-  y: number;
-  z: number;
-  P: { x: number; y: number; z: number };
-  L: number;
-}> = ({ x, y, z, P, L }) => {
-  const transformed = mobiusScalingTransform({ x: x, y: y, z: z }, P, L);
-  return (
-    <mesh position={[transformed.x, transformed.y, transformed.z]}>
-      <sphereGeometry args={[0.1, 32, 32]} />
-      <meshStandardMaterial color={"yellow"} />
-    </mesh>
-  );
-};
+import Circle from "@/components/Circle3D";
+import MobiusSphere from "@/components/MobiusSphere";
+import PointSphere from "@/components/PointSphere";
+import { mobiusScalingTransform } from "@/utils/transformation";
 
 // Main Index component to render both the original and transformed images side-by-side
 const Index: React.FC = () => {
@@ -224,11 +35,12 @@ const Index: React.FC = () => {
           L={L}
           P={P}
           color="blue"
+          mobiusScalingTransform={mobiusScalingTransform}
         />
         <ambientLight intensity={0.5} /> {/* Global ambient light */}
         <directionalLight position={[40, 40, 40]} intensity={1} />
         {/* Main light source */}
-        <PointSphere x={xPosition} y={yPosition} z={zPosition} />
+        <PointSphere x={xPosition} y={yPosition} z={zPosition} color="pink" />
         <MobiusSphere
           radius={1}
           segments={50}
@@ -236,6 +48,7 @@ const Index: React.FC = () => {
           P={P}
           L={L}
           color={"red"}
+          mobiusScalingTransform={mobiusScalingTransform}
         />
         {/* Generate spheres along the blue circle's radius */}
         {/* {Array.from({ length: segments }).map((_, i) => {
