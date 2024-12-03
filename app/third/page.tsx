@@ -1,10 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
-import { fetchMolecule3D, fetchMoleculeDetails } from "@/utils/fetchmolecule";
+import {
+  fetchChemSpiderMoleculeDetails,
+  fetchMolecule3D,
+  fetchMoleculeDetails,
+} from "@/utils/fetchmolecule";
 import { parseSDF, Atom, Bond } from "@/utils/parseSDF";
-import { ModelViewer } from "@/components/activeModelViewer";
-import Image from "next/image";
-import image1 from "@/public/logo.svg";
+import { ModelViewer } from "@/components/activeModelViewerAdapt";
 import Navbar from "@/components/Navbar";
 
 const Home: React.FC = () => {
@@ -23,10 +25,22 @@ const Home: React.FC = () => {
   const handleSearch = async () => {
     if (!inputValue) return;
     setIsLoading(true);
-    const [sdfData, details] = await Promise.all([
-      fetchMolecule3D(inputValue),
-      fetchMoleculeDetails(inputValue),
-    ]);
+
+    // Try fetching data from PubChem first
+    let sdfData = await fetchMolecule3D(inputValue);
+    let details = await fetchMoleculeDetails(inputValue);
+
+    // If PubChem doesn't return data, try ChemSpider
+    if (!sdfData || !details) {
+      const chemSpiderData = await fetchChemSpiderMoleculeDetails(inputValue);
+      if (chemSpiderData) {
+        sdfData = chemSpiderData.sdfData; // Assuming ChemSpider provides SDF data
+        details = {
+          formula: chemSpiderData.formula || "N/A",
+          name: chemSpiderData.name || "Unknown",
+        };
+      }
+    }
 
     if (sdfData && details) {
       const { atoms: parsedAtoms, bonds: parsedBonds } = parseSDF(sdfData);
@@ -37,6 +51,7 @@ const Home: React.FC = () => {
     } else {
       alert("Molecule not found or error fetching data.");
     }
+
     setIsLoading(false);
   };
 

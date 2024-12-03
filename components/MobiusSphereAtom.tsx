@@ -1,5 +1,6 @@
 import React, { useRef, useMemo } from "react";
 import * as THREE from "three";
+import { atomicRadii, atomColors } from "@/utils/atomdata";
 
 interface MobiusSphereAtomProps {
   segments: number;
@@ -28,54 +29,6 @@ const MobiusSphereAtom: React.FC<MobiusSphereAtomProps> = ({
 
   // Destructure center for convenience
   const [centerX, centerY, centerZ] = center;
-
-  const atomicRadii: { [key: string]: number } = {
-    H: 0.25, // Hydrogen
-    He: 0.31, // Helium
-    Li: 1.52, // Lithium
-    Be: 1.12, // Beryllium
-    B: 0.87, // Boron
-    C: 0.77, // Carbon
-    N: 0.75, // Nitrogen
-    O: 0.73, // Oxygen
-    F: 0.64, // Fluorine
-    Ne: 0.38, // Neon
-    Na: 1.54, // Sodium
-    Mg: 1.36, // Magnesium
-    Al: 1.18, // Aluminum
-    Si: 1.11, // Silicon
-    P: 1.07, // Phosphorus
-    S: 1.02, // Sulfur
-    Cl: 0.99, // Chlorine
-    Ar: 0.71, // Argon
-    K: 2.03, // Potassium
-    Ca: 1.97, // Calcium
-    // Add more elements as needed...
-  };
-
-  const atomColors: { [key: string]: string } = {
-    H: "white", // Hydrogen
-    He: "lightgray", // Helium
-    Li: "gray", // Lithium
-    Be: "gray", // Beryllium
-    B: "brown", // Boron
-    C: "gray", // Carbon
-    N: "blue", // Nitrogen
-    O: "red", // Oxygen
-    F: "green", // Fluorine
-    Ne: "lightblue", // Neon
-    Na: "lightblue", // Sodium
-    Mg: "green", // Magnesium
-    Al: "gray", // Aluminum
-    Si: "gray", // Silicon
-    P: "orange", // Phosphorus
-    S: "yellow", // Sulfur
-    Cl: "green", // Chlorine
-    Ar: "lightblue", // Argon
-    K: "purple", // Potassium
-    Ca: "violet", // Calcium
-    // Add more colors as needed...
-  };
 
   const radius = 0.5 * atomicRadii[symbol] || 0.8; // Default to 0.8 if symbol is not in the dictionary
   const color = atomColors[symbol] || "gray"; // Default to gray if symbol is not in the dictionary

@@ -62,41 +62,6 @@ export const ModelViewer: React.FC<{
       setPos2(false);
     }
   };
-
-  const calculateCentroid = (atoms: Atom[]) => {
-    let totalX = 0;
-    let totalY = 0;
-    let totalZ = 0;
-    atoms.forEach((atom) => {
-      totalX += atom.x;
-      totalY += atom.y;
-      totalZ += atom.z;
-    });
-
-    const numAtoms = atoms.length;
-    return {
-      x: totalX / numAtoms,
-      y: totalY / numAtoms,
-      z: totalZ / numAtoms,
-    };
-  };
-
-  // Calculate centroid once atoms are loaded
-  const centroid = calculateCentroid(atoms);
-  const translateAtoms = (
-    atoms: Atom[],
-    centroid: { x: number; y: number; z: number }
-  ) => {
-    return atoms.map((atom) => ({
-      ...atom,
-      x: atom.x - centroid.x,
-      y: atom.y - centroid.y,
-      z: atom.z - centroid.z,
-    }));
-  };
-
-  const centeredAtoms = translateAtoms(atoms, centroid);
-
   return (
     <div className="bg-[#242424] w-full h-full ">
       <div
@@ -128,7 +93,7 @@ export const ModelViewer: React.FC<{
             color={"#3faa73"}
             label="P"
           />
-          {centeredAtoms.map((atom, index) => (
+          {atoms.map((atom, index) => (
             <MobiusSphereAtom
               key={index}
               center={[atom.x, atom.y, atom.z]}
@@ -144,18 +109,18 @@ export const ModelViewer: React.FC<{
             <BondModel
               key={index}
               start={[
-                centeredAtoms[bond.startAtomIndex].x,
-                centeredAtoms[bond.startAtomIndex].y,
-                centeredAtoms[bond.startAtomIndex].z,
+                atoms[bond.startAtomIndex].x,
+                atoms[bond.startAtomIndex].y,
+                atoms[bond.startAtomIndex].z,
               ]}
               end={[
-                centeredAtoms[bond.endAtomIndex].x,
-                centeredAtoms[bond.endAtomIndex].y,
-                centeredAtoms[bond.endAtomIndex].z,
+                atoms[bond.endAtomIndex].x,
+                atoms[bond.endAtomIndex].y,
+                atoms[bond.endAtomIndex].z,
               ]}
-              L={L}
-              P={P}
-              type={bond.type}
+              L={L} // Replace with the actual value of L
+              P={P} // Replace with the actual value of P
+              type={bond.type} // Type of bond (1, 2, 3, etc.)
               mobiusScalingTransform={mobiusScalingTransform}
             />
           ))}

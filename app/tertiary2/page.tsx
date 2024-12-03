@@ -2,7 +2,9 @@
 import { useState, useEffect } from "react";
 import { fetchMolecule3D, fetchMoleculeDetails } from "@/utils/fetchmolecule";
 import { parseSDF, Atom, Bond } from "@/utils/parseSDF";
-import { ModelViewer } from "@/components/activeModelViewerAdapt";
+import { ModelViewer } from "@/components/activeModelViewer";
+import Image from "next/image";
+import image1 from "@/public/logo.svg";
 import Navbar from "@/components/Navbar";
 
 const Home: React.FC = () => {
