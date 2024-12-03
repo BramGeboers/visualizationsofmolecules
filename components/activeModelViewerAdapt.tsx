@@ -3,7 +3,6 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { Atom, Bond } from "@/utils/parseSDF";
 import { IoIosArrowForward } from "react-icons/io";
-import PointSphere from "./PointSphere";
 import PointSphereWithText from "./PointSphereWithText";
 import MobiusSphereAtom from "./MobiusSphereAtom";
 import BondModel from "./BondModel";
@@ -47,18 +46,20 @@ export const ModelViewer: React.FC<{
       `Clicked sphere at position: (${position.x}, ${position.y}, ${position.z})`
     );
 
+    const epsilon = 1e-6; // Small constant to avoid division by zero
+
     if (pos1) {
-      setP_x(position.x);
-      setP_y(position.y);
-      setP_z(position.z);
+      setP_x(position.x + epsilon);
+      setP_y(position.y + epsilon);
+      setP_z(position.z + epsilon);
       setPos1(false);
-      console.log("Updated P:", { P_x, P_y, P_z }); // Add a log to check the updated P
+      // console.log("Updated P:", { P_x, P_y, P_z }); // Add a log to check the updated P
     }
 
     if (pos2) {
-      setXPosition(position.x);
-      setYPosition(position.y);
-      setZPosition(position.z);
+      setXPosition(position.x + epsilon);
+      setYPosition(position.y + epsilon);
+      setZPosition(position.z + epsilon);
       setPos2(false);
     }
   };
@@ -79,6 +80,18 @@ export const ModelViewer: React.FC<{
       y: totalY / numAtoms,
       z: totalZ / numAtoms,
     };
+  };
+
+  const [isCheckedP, setIsCheckedP] = useState(true);
+
+  const [isCheckedOrigin, setIsCheckedOrigin] = useState(true);
+
+  const handleToggleOrigin = () => {
+    setIsCheckedOrigin((prev) => !prev);
+  };
+
+  const handleToggleP = () => {
+    setIsCheckedP((prev) => !prev);
   };
 
   // Calculate centroid once atoms are loaded
@@ -114,27 +127,33 @@ export const ModelViewer: React.FC<{
             shadow-mapSize-height={64}
             shadow-bias={-0.01}
           />
-          <PointSphereWithText
-            x={xPosition}
-            y={yPosition}
-            z={zPosition}
-            color={"#111111"}
-            label={"Origin"}
-          />
-          <PointSphereWithText
-            x={P_x}
-            y={P_y}
-            z={P_z}
-            color={"#3faa73"}
-            label="P"
-          />
+          {isCheckedOrigin && (
+            <PointSphereWithText
+              x={xPosition}
+              y={yPosition}
+              z={zPosition}
+              color={"#111111"}
+              label={"Origin"}
+              visible={isCheckedOrigin}
+            />
+          )}
+          {isCheckedP && (
+            <PointSphereWithText
+              x={P_x}
+              y={P_y}
+              z={P_z}
+              color={"#3faa73"}
+              label="P"
+              visible={isCheckedP}
+            />
+          )}
           {centeredAtoms.map((atom, index) => (
             <MobiusSphereAtom
               key={index}
               center={[atom.x, atom.y, atom.z]}
               L={L}
               P={P}
-              segments={30}
+              segments={40}
               symbol={atom.symbol}
               onClick={() => handleClick({ x: atom.x, y: atom.y, z: atom.z })}
               mobiusScalingTransform={mobiusScalingTransform}
@@ -325,7 +344,7 @@ export const ModelViewer: React.FC<{
         </div>
 
         <button
-          className={`rounded-md p-1 px-3 font-bold text-lg uppercase text-[#111111] transition-all duration-200 ${
+          className={`rounded-md mb-12 p-1 px-3 font-bold text-lg uppercase text-[#111111] transition-all duration-200 ${
             pos1
               ? "bg-[#4AC585] hover:bg-[#3faa73]"
               : "bg-[#3ca06d] hover:bg-[#31855a]"
@@ -334,6 +353,40 @@ export const ModelViewer: React.FC<{
         >
           Select P
         </button>
+        <div className="text-[#111111] bg-[#DBD8D5] rounded-md justify-between flex flex-row p-4">
+          Toggle P Sphere
+          <div
+            className={`relative inline-block w-12 h-6 rounded-md transition-all duration-200 ${
+              isCheckedP ? "bg-[#4AC585]" : "bg-[#242424]"
+            }`}
+            onClick={handleToggleP}
+          >
+            <div
+              className={`absolute top-0 left-0 w-6 h-6 bg-white border-[1px]   rounded-md transition-all duration-200 ${
+                isCheckedP
+                  ? "transform translate-x-6 border-[#4AC585]"
+                  : "border-[#242424]"
+              }`}
+            />
+          </div>
+        </div>
+        <div className="text-[#111111] bg-[#DBD8D5] rounded-md justify-between flex flex-row p-4">
+          Toggle Origin Sphere
+          <div
+            className={`relative inline-block w-12 h-6 rounded-md transition-all duration-200 ${
+              isCheckedOrigin ? "bg-[#4AC585]" : "bg-[#242424]"
+            }`}
+            onClick={handleToggleOrigin}
+          >
+            <div
+              className={`absolute top-0 left-0 w-6 h-6 bg-white border-[1px] rounded-md transition-all duration-200 ${
+                isCheckedOrigin
+                  ? "transform translate-x-6 border-[#4AC585]"
+                  : "border-[#242424]"
+              }`}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

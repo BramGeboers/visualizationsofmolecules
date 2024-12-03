@@ -6,9 +6,17 @@ interface PointSphereProps {
   z: number;
   color: string;
   label: string;
+  visible: boolean;
 }
 
-const PointSphere: React.FC<PointSphereProps> = ({ x, y, z, color, label }) => {
+const PointSphere: React.FC<PointSphereProps> = ({
+  x,
+  y,
+  z,
+  color,
+  label,
+  visible,
+}) => {
   return (
     <>
       {/* PointSphere */}
@@ -17,20 +25,22 @@ const PointSphere: React.FC<PointSphereProps> = ({ x, y, z, color, label }) => {
         <meshStandardMaterial color={color} />
       </mesh>
 
-      {/* Text above the PointSphere */}
-      <Html position={[x, y + 0.25, z]} center>
-        <div
-          style={{
-            color: "white",
-            background: "rgba(0, 0, 0, 0.2)",
-            padding: "2px 5px",
-            borderRadius: "4px",
-            fontSize: "16px",
-          }}
-        >
-          {label}
-        </div>
-      </Html>
+      {/* Conditionally render the label */}
+      {visible && (
+        <Html position={[x, y + 0.25, z]} center>
+          <div
+            style={{
+              color: "white",
+              background: "rgba(0, 0, 0, 0.2)",
+              padding: "2px 5px",
+              borderRadius: "4px",
+              fontSize: "16px",
+            }}
+          >
+            {label}
+          </div>
+        </Html>
+      )}
     </>
   );
 };

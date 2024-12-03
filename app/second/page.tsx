@@ -83,8 +83,8 @@ const Index: React.FC = () => {
             <input
               className="w-[300px] mb-2"
               type="range"
-              min="-2"
-              max="2"
+              min="-3"
+              max="3"
               step="0.01"
               value={L}
               onChange={(e) => setL(parseFloat(e.target.value))}
@@ -92,7 +92,7 @@ const Index: React.FC = () => {
                 appearance: "none",
                 height: "8px",
                 borderRadius: "8px",
-                background: "linear-gradient(to right, #4AC585, #242424)",
+                background: "linear-gradient(to right, #4AC585, #242424)", // Static gradient from green to dark
                 outline: "none",
                 opacity: 0.9,
               }}
@@ -126,7 +126,41 @@ const Index: React.FC = () => {
                 appearance: "none",
                 height: "8px",
                 borderRadius: "8px",
-                background: "linear-gradient(to right, #4AC585, #242424)",
+                background: "linear-gradient(to right, #4AC585, #242424)", // Static gradient from green to dark
+                outline: "none",
+                opacity: 0.9,
+              }}
+            />
+            <style jsx>{`
+              input[type="range"]::-webkit-slider-thumb {
+                appearance: none;
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                background-color: #242424;
+                cursor: pointer;
+                box-shadow: 0 0 2px rgba(0, 0, 0, 0.6);
+              }
+            `}</style>
+          </div>
+          <div className="bg-[#DBD8D5] p-4 flex flex-col rounded-md lg:mb-12 mb-4 items-center ">
+            <div className="flex justify-between w-full max-w-[300px]">
+              <span className="mb-2 flex between">Y</span>
+              <span>{yPosition.toFixed(1)}</span>
+            </div>
+            <input
+              className="w-[300px] mb-2"
+              type="range"
+              min="-3"
+              max="3"
+              step="0.1"
+              value={yPosition}
+              onChange={(e) => setYPosition(parseFloat(e.target.value))}
+              style={{
+                appearance: "none",
+                height: "8px",
+                borderRadius: "8px",
+                background: "linear-gradient(to right, #4AC585, #242424)", // Static gradient from green to dark
                 outline: "none",
                 opacity: 0.9,
               }}
