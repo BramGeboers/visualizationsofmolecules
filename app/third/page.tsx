@@ -14,6 +14,7 @@ const Home: React.FC = () => {
   const [bonds, setBonds] = useState<Bond[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [is2D, setIs2D] = useState<boolean>(false); // Track if the data is 2D
 
   const [moleculeName, setMoleculeName] = useState<string>("");
   const [moleculeFormula, setMoleculeFormula] = useState<string>("");
@@ -26,21 +27,9 @@ const Home: React.FC = () => {
     if (!inputValue) return;
     setIsLoading(true);
 
-    // Try fetching data from PubChem first
-    let sdfData = await fetchMolecule3D(inputValue);
-    let details = await fetchMoleculeDetails(inputValue);
-
-    // If PubChem doesn't return data, try ChemSpider
-    if (!sdfData || !details) {
-      const chemSpiderData = await fetchChemSpiderMoleculeDetails(inputValue);
-      if (chemSpiderData) {
-        sdfData = chemSpiderData.sdfData; // Assuming ChemSpider provides SDF data
-        details = {
-          formula: chemSpiderData.formula || "N/A",
-          name: chemSpiderData.name || "Unknown",
-        };
-      }
-    }
+    // Fetch molecule data
+    const { sdfData, is2D } = await fetchMolecule3D(inputValue);
+    const details = await fetchMoleculeDetails(inputValue);
 
     if (sdfData && details) {
       const { atoms: parsedAtoms, bonds: parsedBonds } = parseSDF(sdfData);
@@ -48,6 +37,7 @@ const Home: React.FC = () => {
       setBonds(parsedBonds);
       setMoleculeFormula(details.formula);
       setMoleculeName(details.name);
+      setIs2D(is2D); // Update 2D status
     } else {
       alert("Molecule not found or error fetching data.");
     }
@@ -62,7 +52,7 @@ const Home: React.FC = () => {
         <input
           className="p-1 w-[230px] text-center bg-[#242424] border-[##DBD8D5] border-2 rounded-md mr-4 bg-opacity-0 "
           type="text"
-          placeholder="Enter compound CID or name"
+          placeholder="Enter a Pubchem CID"
           value={inputValue}
           onChange={handleInputChange}
         />
@@ -84,11 +74,12 @@ const Home: React.FC = () => {
             bonds={bonds}
             moleculeName={moleculeName}
             moleculeFormula={moleculeFormula}
+            is2D={is2D}
           />
         </div>
       ) : (
         <p className="fixed top-[50vh] left-[50vw] -translate-x-1/2 -translate-y-1/2">
-          Enter a CID or name to view a molecule.
+          Enter a Pubchem CID to view a molecule.
         </p>
       )}
     </div>

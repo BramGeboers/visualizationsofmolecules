@@ -13,7 +13,8 @@ export const ModelViewer: React.FC<{
   bonds: Bond[];
   moleculeName: string;
   moleculeFormula: string;
-}> = ({ atoms, bonds, moleculeName, moleculeFormula }) => {
+  is2D: boolean;
+}> = ({ atoms, bonds, moleculeName, moleculeFormula, is2D }) => {
   const [L, setL] = useState(0);
   const [xPosition, setXPosition] = useState(0);
   const [yPosition, setYPosition] = useState(0);
@@ -198,8 +199,11 @@ export const ModelViewer: React.FC<{
         />
       </button>
 
-      <div className="bottom-4 fixed left-4 text-2xl uppercase text-[#4AC585]">
+      <div className="bottom-4 fixed left-4 text-2xl capitalize text-[#4AC585]">
         <p>
+          <span className="text-red-500">
+            {is2D && "2D Model"} <br />
+          </span>
           {moleculeFormula} <br /> {moleculeName}
         </p>
       </div>

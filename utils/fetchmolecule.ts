@@ -3,12 +3,12 @@ const BASE_URL_PUBCHEM = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound";
 const BASE_URL_CHEMSPIDER = "https://api.rsc.org/compounds/v1";
 
 // Fetch 3D molecule data from PubChem (SDF format), fallback to 2D if unavailable
-export const fetchMolecule3D = async (cid: string): Promise<string | null> => {
+export const fetchMolecule3D = async (cid: string): Promise<{ sdfData: string | null; is2D: boolean }> => {
   try {
     // Attempt to fetch 3D data
     const response3D = await fetch(`${BASE_URL_PUBCHEM}/cid/${cid}/SDF?record_type=3d`);
     if (response3D.ok) {
-      return await response3D.text(); // Return the 3D SDF data
+      return { sdfData: await response3D.text(), is2D: false }; // Return 3D SDF data
     } else {
       console.warn("3D data not available, attempting to fetch 2D data...");
     }
@@ -16,15 +16,16 @@ export const fetchMolecule3D = async (cid: string): Promise<string | null> => {
     // Fallback to fetch 2D data
     const response2D = await fetch(`${BASE_URL_PUBCHEM}/cid/${cid}/SDF?record_type=2d`);
     if (response2D.ok) {
-      return await response2D.text(); // Return the 2D SDF data
+      return { sdfData: await response2D.text(), is2D: true }; // Return 2D SDF data
     } else {
       throw new Error("Error fetching SDF data from PubChem (both 3D and 2D unavailable).");
     }
   } catch (error) {
     console.error("Error fetching SDF data from PubChem:", error);
-    return null;
+    return { sdfData: null, is2D: false };
   }
 };
+
 
 
 // Fetch molecule details (name, formula, etc.) from PubChem
