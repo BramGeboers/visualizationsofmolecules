@@ -85,6 +85,7 @@ export const ModelViewer: React.FC<{
             z={zPosition}
             color={"#111111"}
             label={"Origin"}
+            visible={true}
           />
           <PointSphereWithText
             x={P_x}
@@ -92,6 +93,7 @@ export const ModelViewer: React.FC<{
             z={P_z}
             color={"#3faa73"}
             label="P"
+            visible={true}
           />
           {atoms.map((atom, index) => (
             <MobiusSphereAtom

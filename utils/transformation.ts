@@ -9,7 +9,6 @@ export function invert(z: { x: number; y: number; z: number }, P: { x: number; y
       z: dz / denominator + P.z,
     };
   }
-  
   export function scale(z: { x: number; y: number; z: number }, L: number) {
     return {
       x: L * z.x,
