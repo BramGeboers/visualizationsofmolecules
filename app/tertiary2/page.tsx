@@ -3,8 +3,6 @@ import { useState, useEffect } from "react";
 import { fetchMolecule3D, fetchMoleculeDetails } from "@/utils/fetchmolecule";
 import { parseSDF, Atom, Bond } from "@/utils/parseSDF";
 import { ModelViewer } from "@/components/activeModelViewer";
-import Image from "next/image";
-import image1 from "@/public/logo.svg";
 import Navbar from "@/components/Navbar";
 
 const Home: React.FC = () => {
@@ -12,6 +10,7 @@ const Home: React.FC = () => {
   const [bonds, setBonds] = useState<Bond[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [is2D, setIs2D] = useState<boolean>(false); // Track if the data is 2D
 
   const [moleculeName, setMoleculeName] = useState<string>("");
   const [moleculeFormula, setMoleculeFormula] = useState<string>("");
@@ -23,10 +22,10 @@ const Home: React.FC = () => {
   const handleSearch = async () => {
     if (!inputValue) return;
     setIsLoading(true);
-    const [sdfData, details] = await Promise.all([
-      fetchMolecule3D(inputValue),
-      fetchMoleculeDetails(inputValue),
-    ]);
+
+    // Fetch molecule data
+    const { sdfData, is2D } = await fetchMolecule3D(inputValue);
+    const details = await fetchMoleculeDetails(inputValue);
 
     if (sdfData && details) {
       const { atoms: parsedAtoms, bonds: parsedBonds } = parseSDF(sdfData);
@@ -34,9 +33,11 @@ const Home: React.FC = () => {
       setBonds(parsedBonds);
       setMoleculeFormula(details.formula);
       setMoleculeName(details.name);
+      setIs2D(is2D); // Update 2D status
     } else {
       alert("Molecule not found or error fetching data.");
     }
+
     setIsLoading(false);
   };
 
