@@ -2,19 +2,30 @@
 const BASE_URL_PUBCHEM = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound";
 const BASE_URL_CHEMSPIDER = "https://api.rsc.org/compounds/v1";
 
-// Fetch 3D molecule data from PubChem (SDF format)
+// Fetch 3D molecule data from PubChem (SDF format), fallback to 2D if unavailable
 export const fetchMolecule3D = async (cid: string): Promise<string | null> => {
   try {
-    const response = await fetch(`${BASE_URL_PUBCHEM}/cid/${cid}/SDF`);
-    if (!response.ok) {
-      throw new Error("Error fetching SDF data from PubChem.");
+    // Attempt to fetch 3D data
+    const response3D = await fetch(`${BASE_URL_PUBCHEM}/cid/${cid}/SDF?record_type=3d`);
+    if (response3D.ok) {
+      return await response3D.text(); // Return the 3D SDF data
+    } else {
+      console.warn("3D data not available, attempting to fetch 2D data...");
     }
-    return await response.text();  // Return the SDF data
+
+    // Fallback to fetch 2D data
+    const response2D = await fetch(`${BASE_URL_PUBCHEM}/cid/${cid}/SDF?record_type=2d`);
+    if (response2D.ok) {
+      return await response2D.text(); // Return the 2D SDF data
+    } else {
+      throw new Error("Error fetching SDF data from PubChem (both 3D and 2D unavailable).");
+    }
   } catch (error) {
     console.error("Error fetching SDF data from PubChem:", error);
     return null;
   }
 };
+
 
 // Fetch molecule details (name, formula, etc.) from PubChem
 export const fetchMoleculeDetails = async (cid: string): Promise<{ formula: string; name: string } | null> => {

@@ -53,7 +53,6 @@ export const ModelViewer: React.FC<{
       setP_y(position.y + epsilon);
       setP_z(position.z + epsilon);
       setPos1(false);
-      // console.log("Updated P:", { P_x, P_y, P_z }); // Add a log to check the updated P
     }
 
     if (pos2) {

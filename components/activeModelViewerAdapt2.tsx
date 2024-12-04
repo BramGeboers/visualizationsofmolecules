@@ -38,6 +38,8 @@ export const ModelViewer: React.FC<{
     setPos1(!pos1);
   };
 
+  
+
   const handleButton2 = () => {
     setPos2(!pos2);
   };
