@@ -27,22 +27,49 @@ const Home: React.FC = () => {
     if (!inputValue) return;
     setIsLoading(true);
 
-    // Fetch molecule data
-    const { sdfData, is2D } = await fetchMolecule3D(inputValue);
-    const details = await fetchMoleculeDetails(inputValue);
+    let sdfData: string | null = null;
+    let is2D: boolean = false;
+    let details: { formula: string; name: string } | null = null;
 
-    if (sdfData && details) {
-      const { atoms: parsedAtoms, bonds: parsedBonds } = parseSDF(sdfData);
-      setAtoms(parsedAtoms);
-      setBonds(parsedBonds);
-      setMoleculeFormula(details.formula);
-      setMoleculeName(details.name);
-      setIs2D(is2D); // Update 2D status
-    } else {
-      alert("Molecule not found or error fetching data.");
+    try {
+      // Attempt fetching from PubChem
+      const pubChemResult = await fetchMolecule3D(inputValue);
+      sdfData = pubChemResult.sdfData;
+      is2D = pubChemResult.is2D;
+      details = await fetchMoleculeDetails(inputValue);
+
+      if (!sdfData || !details) {
+        console.warn("PubChem data unavailable, trying ChemSpider...");
+        const chemSpiderData = await fetchChemSpiderMoleculeDetails(inputValue);
+
+        if (chemSpiderData) {
+          sdfData = chemSpiderData.sdfData; // Assuming ChemSpider provides SDF data
+          details = {
+            formula: chemSpiderData.formula || "N/A",
+            name: chemSpiderData.name || "Unknown",
+          };
+          is2D = true; // Assume ChemSpider data is 2D
+        }
+      }
+
+      if (sdfData && details) {
+        const { atoms: parsedAtoms, bonds: parsedBonds } = parseSDF(sdfData);
+        setAtoms(parsedAtoms);
+        setBonds(parsedBonds);
+        setMoleculeFormula(details.formula);
+        setMoleculeName(details.name);
+        setIs2D(is2D);
+      } else {
+        alert(
+          "Molecule not found or error fetching data from both PubChem and ChemSpider."
+        );
+      }
+    } catch (error) {
+      console.error("Error during molecule search:", error);
+      alert("An error occurred while fetching molecule data.");
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (

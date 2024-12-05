@@ -8,6 +8,9 @@ import Circle from "@/components/Circle3D";
 import MobiusSphere from "@/components/MobiusSphere";
 import PointSphere from "@/components/PointSphere";
 import { mobiusScalingTransform } from "@/utils/transformation";
+import MobiusPlane from "@/components/MobiusPlane";
+import TransformedPointSphere from "@/components/TransformedPointSphere";
+import Circle2D from "@/components/Circle2D";
 
 // Main Index component to render both the original and transformed images side-by-side
 const Index: React.FC = () => {
@@ -18,17 +21,15 @@ const Index: React.FC = () => {
 
   const P = { x: xPosition, y: yPosition, z: zPosition };
 
-  const radius = 1; // Radius of the blue circle
-  const segments = 10; // Number of spheres on the circle
-
   return (
     <div className="bg-[#242424] w-full min-h-[100vh]">
       <Navbar />
       <Canvas
-        style={{ height: "80vh", width: "100%" }}
+        style={{ height: "100vh", width: "100%" }}
         camera={{ position: [0, 0, 10] }}
       >
-        <Circle
+        <directionalLight position={[100, 100, 100]} intensity={1} />
+        {/* <Circle
           radius={radius}
           segments={1024}
           center={[0, 0, 0]}
@@ -36,14 +37,32 @@ const Index: React.FC = () => {
           P={P}
           color="blue"
           mobiusScalingTransform={mobiusScalingTransform}
-        />
-        <ambientLight intensity={0.5} /> {/* Global ambient light */}
-        <directionalLight position={[40, 40, 40]} intensity={1} />
-        {/* Main light source */}
+        /> */}
+        <ambientLight intensity={0.3} />
         <PointSphere x={xPosition} y={yPosition} z={zPosition} color="pink" />
+        <MobiusPlane
+          L={L}
+          P={P}
+          lineWidth={0.5}
+          density={30}
+          size={10}
+          resolution={512}
+        />
+        {/* {Array.from({ length: 17 }, (_, i) => 1 + i * 1.5).map((radius) => (
+          <Circle2D
+            key={radius} // Add a unique key for each circle
+            radius={radius}
+            segments={1024}
+            center={[0, 0]}
+            color="blue"
+            P={P}
+            L={L}
+            mobiusScalingTransform={mobiusScalingTransform}
+          />
+        ))} */}
         <MobiusSphere
           radius={1}
-          segments={50}
+          segments={512}
           center={[0, 0, 0]}
           P={P}
           L={L}
@@ -66,6 +85,7 @@ const Index: React.FC = () => {
                 z={z}
                 P={P}
                 L={L}
+                mobiusScalingTransform={mobiusScalingTransform}
               />
             );
           });
@@ -156,6 +176,40 @@ const Index: React.FC = () => {
               step="0.1"
               value={yPosition}
               onChange={(e) => setYPosition(parseFloat(e.target.value))}
+              style={{
+                appearance: "none",
+                height: "8px",
+                borderRadius: "8px",
+                background: "linear-gradient(to right, #4AC585, #242424)", // Static gradient from green to dark
+                outline: "none",
+                opacity: 0.9,
+              }}
+            />
+            <style jsx>{`
+              input[type="range"]::-webkit-slider-thumb {
+                appearance: none;
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                background-color: #242424;
+                cursor: pointer;
+                box-shadow: 0 0 2px rgba(0, 0, 0, 0.6);
+              }
+            `}</style>
+          </div>
+          <div className="bg-[#DBD8D5] p-4 flex flex-col rounded-md lg:mb-12 mb-4 items-center ">
+            <div className="flex justify-between w-full max-w-[300px]">
+              <span className="mb-2 flex between">Z</span>
+              <span>{zPosition.toFixed(1)}</span>
+            </div>
+            <input
+              className="w-[300px] mb-2"
+              type="range"
+              min="-3"
+              max="3"
+              step="0.1"
+              value={zPosition}
+              onChange={(e) => setZPosition(parseFloat(e.target.value))}
               style={{
                 appearance: "none",
                 height: "8px",

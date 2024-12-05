@@ -91,7 +91,9 @@ const MobiusSphere: React.FC<MobiusSphereProps> = ({
   // Apply the color to the material
   const material = new THREE.MeshStandardMaterial({
     color: colorInstance,
-    emissive: new THREE.Color(color), // Slightly emit light to brighten up
+    emissive: new THREE.Color(color).multiplyScalar(0.2), // Slightly emit light to brighten up
+    metalness: 0.6, // Makes the material look more metallic
+    roughness: 0.5, // Controls how shiny the surface is (lower means shinier)
   });
 
   return (

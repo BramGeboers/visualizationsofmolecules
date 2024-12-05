@@ -57,21 +57,24 @@ export const fetchChemSpiderMoleculeDetails = async (cid: string): Promise<any |
   const apiKey = "3lc0PVxhvI3CaTSMSqFssh1vhCG8W9o1iP8bWxpf"; // Use your ChemSpider API key here
   try {
     // First, filter compounds by CID
-    const filterResponse = await fetch(`${BASE_URL_CHEMSPIDER}/filter/cid`, {
-      method: 'POST',
+    const proxyUrl = "https://cors-anywhere.herokuapp.com/";
+    const url = `${proxyUrl}https://api.rsc.org/compounds/v1/filter/name`;
+    const filterResponse = await fetch(url, {
+      method: "POST",
       headers: {
         "apikey": apiKey,
         "Content-Type": "application/json",
         "Accept": "application/json"
       },
-      body: JSON.stringify({ cid })
+      body: JSON.stringify({ name: cid, orderBy: "default", orderDirection: "default" })
     });
+;
 
     const filterData = await filterResponse.json();
     const queryId = filterData.queryId;
 
     // Then, retrieve the results
-    const resultResponse = await fetch(`${BASE_URL_CHEMSPIDER}/filter/${queryId}/results`, {
+    const resultResponse = await fetch(`${proxyUrl}${BASE_URL_CHEMSPIDER}/filter/${queryId}/results`, {
       headers: {
         "apikey": apiKey,
         "Accept": "application/json"
