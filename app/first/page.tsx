@@ -79,9 +79,9 @@ const Index: React.FC = () => {
     <div className="bg-[#242424] w-full min-h-[100vh]">
       <Navbar />
       <Canvas
-        style={{ height: "80vh", width: "100%" }}
-        camera={{ position: [0, 0, 2] }}
         orthographic
+        style={{ height: "100vh", width: "100%" }}
+        camera={{ position: [0, 0, 10], zoom: 40 }}
       >
         <Circle2D
           radius={radius}

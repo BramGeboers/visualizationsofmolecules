@@ -24,10 +24,11 @@ const Index: React.FC = () => {
   return (
     <div className="bg-[#242424] w-full min-h-[100vh]">
       <Navbar />
+
       <Canvas
-        style={{ height: "100vh", width: "100%" }}
-        camera={{ position: [0, 0, 10] }}
         orthographic
+        style={{ height: "100vh", width: "100%" }}
+        camera={{ position: [0, 0, 200], zoom: 40 }}
       >
         <directionalLight position={[100, 100, 100]} intensity={1} />
         {/* <Circle
