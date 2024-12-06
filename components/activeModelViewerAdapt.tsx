@@ -117,7 +117,7 @@ export const ModelViewer: React.FC<{
           navActive ? "w-[100vw]" : "w-[80vw]"
         }`}
       >
-        <Canvas>
+        <Canvas orthographic>
           <ambientLight intensity={0.25} />
           <directionalLight
             position={[40, 40, 40]}
