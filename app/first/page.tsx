@@ -6,6 +6,7 @@ import { OrbitControls, Text } from "@react-three/drei";
 import Navbar from "@/components/Navbar";
 import Circle2D from "@/components/Circle2D";
 import { mobiusScalingTransform } from "@/utils/transformation";
+import MobiusPlane from "@/components/MobiusPlane";
 
 // Function to perform inversion around point P with radius 1
 const CircleUnaffected: React.FC<{
@@ -107,6 +108,15 @@ const Index: React.FC = () => {
           color="red"
         />
 
+        <MobiusPlane
+          L={L}
+          P={P}
+          lineWidth={0.5}
+          density={30}
+          size={10}
+          resolution={512}
+        />
+
         <directionalLight position={[5, 5, 5]} intensity={1} />
         <PointSphere x={xPosition} y={yPosition} />
         <PointSphere x={0} y={0} />
@@ -127,7 +137,7 @@ const Index: React.FC = () => {
           Scaled
         </Text> */}
 
-        <axesHelper />
+        {/* <axesHelper /> */}
         <OrbitControls />
       </Canvas>
       <div className="fixed bottom-0 p-2 rounded-lg flex justify-center w-full text-[#111111]">
