@@ -117,7 +117,7 @@ export const ModelViewer: React.FC<{
           navActive ? "w-[100vw]" : "w-[80vw]"
         }`}
       >
-        <Canvas orthographic camera={{ position: [0, 0, 10], zoom: 100 }}>
+        <Canvas orthographic camera={{ position: [0, 0, 10], zoom: 40 }}>
           <ambientLight intensity={0.25} />
           <directionalLight
             position={[40, 40, 40]}
