@@ -79,7 +79,7 @@ const Index: React.FC = () => {
       <Navbar />
       <Canvas
         style={{ height: "80vh", width: "100%" }}
-        camera={{ position: [0, 0, 5] }}
+        camera={{ position: [0, 0, 10] }}
         orthographic
       >
         <Circle2D

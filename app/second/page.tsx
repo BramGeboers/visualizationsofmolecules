@@ -27,6 +27,7 @@ const Index: React.FC = () => {
       <Canvas
         style={{ height: "100vh", width: "100%" }}
         camera={{ position: [0, 0, 10] }}
+        orthographic
       >
         <directionalLight position={[100, 100, 100]} intensity={1} />
         {/* <Circle
