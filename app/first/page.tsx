@@ -107,7 +107,6 @@ const Index: React.FC = () => {
           center={[1.5, 0]}
           color="red"
         /> */}
-
         <MobiusPlane
           L={L}
           P={P}
@@ -116,11 +115,9 @@ const Index: React.FC = () => {
           size={10}
           resolution={512}
         />
-
         <directionalLight position={[5, 5, 5]} intensity={1} />
         <PointSphere x={xPosition} y={yPosition} />
         <PointSphere x={0} y={0} />
-
         {/* Generate spheres along the blue circle's radius */}
         {Array.from({ length: segments }).map((_, i) => {
           const angle = (i / segments) * Math.PI * 2;
@@ -128,7 +125,6 @@ const Index: React.FC = () => {
           const y = radius * Math.sin(angle);
           return <TransformedPointSphere key={i} x={x} y={y} P={P} L={L} />;
         })}
-
         {/* Text labels */}
         {/* <Text position={[-3, 3, 0]} fontSize={0.5} color="black">
           Original
@@ -136,9 +132,12 @@ const Index: React.FC = () => {
         <Text position={[3, 3, 0]} fontSize={0.5} color="black">
           Scaled
         </Text> */}
-
         {/* <axesHelper /> */}
-        <OrbitControls />
+        <OrbitControls
+          enableRotate={false} // Disable rotation
+          enableZoom={true} // Disable zoom (optional, if needed)
+          enablePan={true} // Allow panning
+        />{" "}
       </Canvas>
       <div className="fixed bottom-0 p-2 rounded-lg flex justify-center w-full text-[#111111]">
         <div className="flex lg:flex-row flex-col lg:gap-12 gap-2">
