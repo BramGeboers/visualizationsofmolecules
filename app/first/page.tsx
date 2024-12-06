@@ -101,12 +101,12 @@ const Index: React.FC = () => {
           color="gray"
           mobiusScalingTransform={mobiusScalingTransform}
         />
-        <CircleUnaffected
+        {/* <CircleUnaffected
           radius={1.5}
           segments={1024}
           center={[1.5, 0]}
           color="red"
-        />
+        /> */}
 
         <MobiusPlane
           L={L}
