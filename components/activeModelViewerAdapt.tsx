@@ -159,7 +159,7 @@ export const ModelViewer: React.FC<{
               mobiusScalingTransform={mobiusScalingTransform}
             />
           ))}
-          {bonds.map((bond, index) => (
+          {/* {bonds.map((bond, index) => (
             <BondModel
               key={index}
               start={[
@@ -177,7 +177,7 @@ export const ModelViewer: React.FC<{
               type={bond.type}
               mobiusScalingTransform={mobiusScalingTransform}
             />
-          ))}
+          ))} */}
 
           <OrbitControls />
         </Canvas>

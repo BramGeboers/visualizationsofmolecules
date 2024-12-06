@@ -30,7 +30,7 @@ const MobiusSphereAtom: React.FC<MobiusSphereAtomProps> = ({
   // Destructure center for convenience
   const [centerX, centerY, centerZ] = center;
 
-  const radius = 0.5 * atomicRadii[symbol] || 0.8; // Default to 0.8 if symbol is not in the dictionary
+  const radius = atomicRadii[symbol] || 0.8; // Default to 0.8 if symbol is not in the dictionary
   const color = atomColors[symbol] || "gray"; // Default to gray if symbol is not in the dictionary
 
   // Generate vertices and apply Möbius transformations
