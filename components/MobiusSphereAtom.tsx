@@ -1,6 +1,7 @@
 import React, { useRef, useMemo } from "react";
 import * as THREE from "three";
 import { atomicRadii, atomColors } from "@/utils/atomdata";
+import { mobiusScalingTransform } from "@/utils/transformation";
 
 interface MobiusSphereAtomProps {
   segments: number;
@@ -9,11 +10,6 @@ interface MobiusSphereAtomProps {
   L: number;
   symbol: string;
   onClick: () => void;
-  mobiusScalingTransform: (
-    point: { x: number; y: number; z: number },
-    P: { x: number; y: number; z: number },
-    L: number
-  ) => { x: number; y: number; z: number };
 }
 
 const MobiusSphereAtom: React.FC<MobiusSphereAtomProps> = ({
@@ -22,7 +18,6 @@ const MobiusSphereAtom: React.FC<MobiusSphereAtomProps> = ({
   P,
   L,
   symbol,
-  mobiusScalingTransform,
   onClick,
 }) => {
   const sphereRef = useRef<THREE.Mesh>(null);

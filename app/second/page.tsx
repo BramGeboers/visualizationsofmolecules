@@ -1,242 +1,113 @@
 "use client";
-import React, { useState, useRef, useEffect, useMemo } from "react";
-import { Canvas } from "@react-three/fiber";
-import * as THREE from "three";
-import { OrbitControls, Text } from "@react-three/drei";
+import { useState, useEffect } from "react";
+import {
+  fetchChemSpiderMoleculeDetails,
+  fetchMolecule2D,
+  fetchMolecule3D,
+  fetchMoleculeDetails,
+} from "@/utils/fetchmolecule";
+import { parseSDF, Atom, Bond } from "@/utils/parseSDF";
+import { ModelViewer2D } from "@/components/activeModelViewer2D";
 import Navbar from "@/components/Navbar";
-import Circle from "@/components/Circle3D";
-import MobiusSphere from "@/components/MobiusSphere";
-import PointSphere from "@/components/PointSphere";
-import { mobiusScalingTransform } from "@/utils/transformation";
-import MobiusPlane from "@/components/MobiusPlane";
-import TransformedPointSphere from "@/components/TransformedPointSphere";
-import Circle2D from "@/components/Circle2D";
 
-// Main Index component to render both the original and transformed images side-by-side
-const Index: React.FC = () => {
-  const [L, setL] = useState(0);
-  const [xPosition, setXPosition] = useState(1.5);
-  const [yPosition, setYPosition] = useState(0);
-  const [zPosition, setZPosition] = useState(0); // Added z position for P
+const Home: React.FC = () => {
+  const [atoms, setAtoms] = useState<Atom[]>([]);
+  const [bonds, setBonds] = useState<Bond[]>([]);
+  const [inputValue, setInputValue] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const P = { x: xPosition, y: yPosition, z: zPosition };
+  const [moleculeName, setMoleculeName] = useState<string>("");
+  const [moleculeFormula, setMoleculeFormula] = useState<string>("");
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(event.target.value);
+  };
+
+  const handleSearch = async () => {
+    if (!inputValue) return;
+    setIsLoading(true);
+
+    let sdfData: string | null = null;
+    let is2D: boolean = false;
+    let details: { formula: string; name: string } | null = null;
+
+    try {
+      // Attempt fetching from PubChem
+      const pubChemResult = await fetchMolecule2D(inputValue);
+      sdfData = pubChemResult.sdfData;
+      details = await fetchMoleculeDetails(inputValue);
+
+      if (!sdfData || !details) {
+        console.warn("PubChem data unavailable, trying ChemSpider...");
+        const chemSpiderData = await fetchChemSpiderMoleculeDetails(inputValue);
+
+        if (chemSpiderData) {
+          sdfData = chemSpiderData.sdfData; // Assuming ChemSpider provides SDF data
+          details = {
+            formula: chemSpiderData.formula || "N/A",
+            name: chemSpiderData.name || "Unknown",
+          };
+          is2D = true; // Assume ChemSpider data is 2D
+        }
+      }
+
+      if (sdfData && details) {
+        const { atoms: parsedAtoms, bonds: parsedBonds } = parseSDF(sdfData);
+        setAtoms(parsedAtoms);
+        setBonds(parsedBonds);
+        setMoleculeFormula(details.formula);
+        setMoleculeName(details.name);
+      } else {
+        alert(
+          "Molecule not found or error fetching data from both PubChem and ChemSpider."
+        );
+      }
+    } catch (error) {
+      console.error("Error during molecule search:", error);
+      alert("An error occurred while fetching molecule data.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <div className="bg-[#242424] w-full min-h-[100vh]">
+    <div className="w-full h-[100vh] bg-[#242424] text-[#DBD8D5]">
       <Navbar />
-
-      <Canvas
-        orthographic
-        style={{ height: "100vh", width: "100%" }}
-        camera={{ position: [0, 0, 200], zoom: 40 }}
-      >
-        <directionalLight position={[100, 100, 100]} intensity={1} />
-        {/* <Circle
-          radius={radius}
-          segments={1024}
-          center={[0, 0, 0]}
-          L={L}
-          P={P}
-          color="blue"
-          mobiusScalingTransform={mobiusScalingTransform}
-        /> */}
-        <ambientLight intensity={0.3} />
-        <PointSphere x={xPosition} y={yPosition} z={zPosition} color="pink" />
-        <MobiusPlane
-          L={L}
-          P={P}
-          lineWidth={0.5}
-          density={30}
-          size={10}
-          resolution={512}
+      <div className="flex absolute z-50 left-[50vw] h-[56px] lg:pt-4 pt-28 items-center -translate-x-[50%]">
+        <input
+          className="p-1 w-[230px] text-center bg-[#242424] border-[##DBD8D5] border-2 rounded-md mr-4 bg-opacity-0 "
+          type="text"
+          placeholder="Enter a Pubchem CID"
+          value={inputValue}
+          onChange={handleInputChange}
         />
-        {/* {Array.from({ length: 17 }, (_, i) => 1 + i * 1.5).map((radius) => (
-          <Circle2D
-            key={radius} // Add a unique key for each circle
-            radius={radius}
-            segments={1024}
-            center={[0, 0]}
-            color="blue"
-            P={P}
-            L={L}
-            mobiusScalingTransform={mobiusScalingTransform}
-          />
-        ))} */}
-        <MobiusSphere
-          radius={1}
-          segments={512}
-          center={[0, 0, 0]}
-          P={P}
-          L={L}
-          color={"red"}
-          mobiusScalingTransform={mobiusScalingTransform}
-        />
-        {/* Generate spheres along the blue circle's radius */}
-        {/* {Array.from({ length: segments }).map((_, i) => {
-          const phi = (i / segments) * Math.PI; // Polar angle
-          return Array.from({ length: segments }).map((_, j) => {
-            const theta = (j / segments) * 2 * Math.PI; // Azimuthal angle
-            const x = radius * Math.sin(phi) * Math.cos(theta);
-            const y = radius * Math.sin(phi) * Math.sin(theta);
-            const z = radius * Math.cos(phi);
-            return (
-              <TransformedPointSphere
-                key={`${i}-${j}`}
-                x={x}
-                y={y}
-                z={z}
-                P={P}
-                L={L}
-                mobiusScalingTransform={mobiusScalingTransform}
-              />
-            );
-          });
-        })} */}
-        <axesHelper />
-        <OrbitControls />
-      </Canvas>
-      <div className="fixed bottom-0 p-2 rounded-lg flex justify-center w-full text-[#111111]">
-        <div className="flex lg:flex-row flex-col lg:gap-12 gap-2">
-          <div className="bg-[#DBD8D5] p-4 flex flex-col rounded-md lg:mb-12 mb-3 items-center ">
-            <div className="flex justify-between w-full max-w-[300px]">
-              <span className="mb-2 flex between">Zoom</span>
-              <span>{L.toFixed(2)}</span>
-            </div>
-            <input
-              className="w-[300px] mb-2"
-              type="range"
-              min="-3"
-              max="3"
-              step="0.01"
-              value={L}
-              onChange={(e) => setL(parseFloat(e.target.value))}
-              style={{
-                appearance: "none",
-                height: "8px",
-                borderRadius: "8px",
-                background: "linear-gradient(to right, #4AC585, #242424)", // Static gradient from green to dark
-                outline: "none",
-                opacity: 0.9,
-              }}
-            />
-            <style jsx>{`
-              input[type="range"]::-webkit-slider-thumb {
-                appearance: none;
-                width: 20px;
-                height: 20px;
-                border-radius: 50%;
-                background-color: #242424;
-                cursor: pointer;
-                box-shadow: 0 0 2px rgba(0, 0, 0, 0.6);
-              }
-            `}</style>
-          </div>
-          <div className="bg-[#DBD8D5] p-4 flex flex-col rounded-md lg:mb-12 mb-3 items-center ">
-            <div className="flex justify-between w-full max-w-[300px]">
-              <span className="mb-2 flex between">X</span>
-              <span>{xPosition.toFixed(1)}</span>
-            </div>
-            <input
-              className="w-[300px] mb-2"
-              type="range"
-              min="-3"
-              max="3"
-              step="0.1"
-              value={xPosition}
-              onChange={(e) => setXPosition(parseFloat(e.target.value))}
-              style={{
-                appearance: "none",
-                height: "8px",
-                borderRadius: "8px",
-                background: "linear-gradient(to right, #4AC585, #242424)", // Static gradient from green to dark
-                outline: "none",
-                opacity: 0.9,
-              }}
-            />
-            <style jsx>{`
-              input[type="range"]::-webkit-slider-thumb {
-                appearance: none;
-                width: 20px;
-                height: 20px;
-                border-radius: 50%;
-                background-color: #242424;
-                cursor: pointer;
-                box-shadow: 0 0 2px rgba(0, 0, 0, 0.6);
-              }
-            `}</style>
-          </div>
-          <div className="bg-[#DBD8D5] p-4 flex flex-col rounded-md lg:mb-12 mb-4 items-center ">
-            <div className="flex justify-between w-full max-w-[300px]">
-              <span className="mb-2 flex between">Y</span>
-              <span>{yPosition.toFixed(1)}</span>
-            </div>
-            <input
-              className="w-[300px] mb-2"
-              type="range"
-              min="-3"
-              max="3"
-              step="0.1"
-              value={yPosition}
-              onChange={(e) => setYPosition(parseFloat(e.target.value))}
-              style={{
-                appearance: "none",
-                height: "8px",
-                borderRadius: "8px",
-                background: "linear-gradient(to right, #4AC585, #242424)", // Static gradient from green to dark
-                outline: "none",
-                opacity: 0.9,
-              }}
-            />
-            <style jsx>{`
-              input[type="range"]::-webkit-slider-thumb {
-                appearance: none;
-                width: 20px;
-                height: 20px;
-                border-radius: 50%;
-                background-color: #242424;
-                cursor: pointer;
-                box-shadow: 0 0 2px rgba(0, 0, 0, 0.6);
-              }
-            `}</style>
-          </div>
-          <div className="bg-[#DBD8D5] p-4 flex flex-col rounded-md lg:mb-12 mb-4 items-center ">
-            <div className="flex justify-between w-full max-w-[300px]">
-              <span className="mb-2 flex between">Z</span>
-              <span>{zPosition.toFixed(1)}</span>
-            </div>
-            <input
-              className="w-[300px] mb-2"
-              type="range"
-              min="-3"
-              max="3"
-              step="0.1"
-              value={zPosition}
-              onChange={(e) => setZPosition(parseFloat(e.target.value))}
-              style={{
-                appearance: "none",
-                height: "8px",
-                borderRadius: "8px",
-                background: "linear-gradient(to right, #4AC585, #242424)", // Static gradient from green to dark
-                outline: "none",
-                opacity: 0.9,
-              }}
-            />
-            <style jsx>{`
-              input[type="range"]::-webkit-slider-thumb {
-                appearance: none;
-                width: 20px;
-                height: 20px;
-                border-radius: 50%;
-                background-color: #242424;
-                cursor: pointer;
-                box-shadow: 0 0 2px rgba(0, 0, 0, 0.6);
-              }
-            `}</style>
-          </div>
-        </div>
+        <button
+          className="rounded-md bg-[#4AC585] hover:bg-[#3faa73] transition-all duration-200  text-[#111111] p-1 px-3 font-bold text-lg uppercase"
+          onClick={handleSearch}
+        >
+          Search
+        </button>
       </div>
+      {isLoading ? (
+        <p className="fixed top-[50vh] left-[50vw] -translate-x-1/2 -translate-y-1/2">
+          Loading molecule...
+        </p>
+      ) : atoms.length > 0 ? (
+        <div className="h-[100vh] bg-gray-500">
+          <ModelViewer2D
+            atoms={atoms}
+            bonds={bonds}
+            moleculeName={moleculeName}
+            moleculeFormula={moleculeFormula}
+          />
+        </div>
+      ) : (
+        <p className="fixed top-[50vh] left-[50vw] -translate-x-1/2 -translate-y-1/2">
+          Enter a Pubchem CID to view a molecule.
+        </p>
+      )}
     </div>
   );
 };
 
-export default Index;
+export default Home;

@@ -1,12 +1,18 @@
 import React, { useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import {
+  ArcballControls,
+  CameraControls,
+  OrbitControls,
+  TrackballControls,
+  TransformControls,
+} from "@react-three/drei";
 import { Atom, Bond } from "@/utils/parseSDF";
 import { IoIosArrowForward } from "react-icons/io";
 import PointSphereWithText from "./PointSphereWithText";
 import MobiusSphereAtom from "./MobiusSphereAtom";
 import BondModel from "./BondModel";
-import { mobiusScalingTransform } from "@/utils/transformation";
+import TransformedPointSphereWithText from "./TransformedPointSphereWithText";
 
 export const ModelViewer: React.FC<{
   atoms: Atom[];
@@ -117,7 +123,9 @@ export const ModelViewer: React.FC<{
           navActive ? "w-[100vw]" : "w-[80vw]"
         }`}
       >
-        <Canvas orthographic camera={{ position: [0, 0, 10], zoom: 40 }}>
+        <Canvas orthographic camera={{ position: [0, 0, 100], zoom: 40 }}>
+          <ArcballControls makeDefault />
+
           <ambientLight intensity={0.25} />
           <directionalLight
             position={[40, 40, 40]}
@@ -127,14 +135,23 @@ export const ModelViewer: React.FC<{
             shadow-mapSize-height={64}
             shadow-bias={-0.01}
           />
+          <directionalLight
+            position={[0, 0, -400]}
+            intensity={0.5}
+            castShadow
+            shadow-mapSize-width={64}
+            shadow-mapSize-height={64}
+            shadow-bias={-0.01}
+          />
           {isCheckedOrigin && (
-            <PointSphereWithText
+            <TransformedPointSphereWithText
               x={xPosition}
               y={yPosition}
               z={zPosition}
+              P={P}
+              L={L}
               color={"#111111"}
               label={"Origin"}
-              visible={isCheckedOrigin}
             />
           )}
           {isCheckedP && (
@@ -144,7 +161,6 @@ export const ModelViewer: React.FC<{
               z={P_z}
               color={"#3faa73"}
               label="P"
-              visible={isCheckedP}
             />
           )}
           {centeredAtoms.map((atom, index) => (
@@ -156,7 +172,6 @@ export const ModelViewer: React.FC<{
               segments={40}
               symbol={atom.symbol}
               onClick={() => handleClick({ x: atom.x, y: atom.y, z: atom.z })}
-              mobiusScalingTransform={mobiusScalingTransform}
             />
           ))}
           {/* {bonds.map((bond, index) => (
@@ -178,8 +193,7 @@ export const ModelViewer: React.FC<{
               mobiusScalingTransform={mobiusScalingTransform}
             />
           ))} */}
-
-          <OrbitControls />
+          {/* <OrbitControls /> */}
         </Canvas>
       </div>
 

@@ -137,7 +137,7 @@ const Index: React.FC = () => {
           enableRotate={false} // Disable rotation
           enableZoom={true} // Disable zoom (optional, if needed)
           enablePan={true} // Allow panning
-        />{" "}
+        />
       </Canvas>
       <div className="fixed bottom-0 p-2 rounded-lg flex justify-center w-full text-[#111111]">
         <div className="flex lg:flex-row flex-col lg:gap-12 gap-2">

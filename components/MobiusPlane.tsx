@@ -39,7 +39,7 @@ const MobiusPlane: React.FC<{
           i,
           transformed.x,
           transformed.y,
-          transformed.z
+          transformed.z - 1e-3
         );
       }
     }

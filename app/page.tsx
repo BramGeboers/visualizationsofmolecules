@@ -52,13 +52,24 @@ const Index: React.FC = () => {
             </div>
           </Link>
         </div>
+        <div className="flex flex-row justify-between gap-4 w-[80%] sm:w-[600px] lg:w-[700px]">
+          <p className="flex flex-row">
+            <span className="mr-8 lg:block hidden">02. </span> 2D Transformation
+            on 2D Molecules
+          </p>
+          <Link href="/second">
+            <div className="rounded-md bg-[#4AC585] hover:bg-[#3faa73] transition-all duration-200 text-[#111111] p-1 px-3 flex items-center justify-center">
+              <IoIosArrowRoundForward color="#111111" />
+            </div>
+          </Link>
+        </div>
 
         <div className="flex flex-row justify-between gap-4 w-[80%] sm:w-[600px] lg:w-[700px]">
           <p className="flex flex-row">
             <span className="mr-8 lg:block hidden">02. </span> 3D Transformation
             on Spheres
           </p>
-          <Link href="/second">
+          <Link href="/third">
             <div className="rounded-md bg-[#4AC585] hover:bg-[#3faa73] transition-all duration-200 text-[#111111] p-1 px-3 flex items-center justify-center">
               <IoIosArrowRoundForward color="#111111" />
             </div>
@@ -70,7 +81,7 @@ const Index: React.FC = () => {
             <span className="mr-8 lg:block hidden">03. </span> 3D Transformation
             on Molecules{" "}
           </p>
-          <Link href="/third">
+          <Link href="/fourth">
             <div className="rounded-md bg-[#4AC585] hover:bg-[#3faa73] transition-all duration-200 text-[#111111] p-1 px-3 flex items-center justify-center">
               <IoIosArrowRoundForward color="#111111" />
             </div>

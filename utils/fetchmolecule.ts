@@ -26,6 +26,21 @@ export const fetchMolecule3D = async (cid: string): Promise<{ sdfData: string | 
   }
 };
 
+export const fetchMolecule2D = async (cid: string): Promise<{ sdfData: string |  null  }> => {
+  try {
+    // Fallback to fetch 2D data
+    const response2D = await fetch(`${BASE_URL_PUBCHEM}/cid/${cid}/SDF?record_type=2d`);
+    if (response2D.ok) {
+      return { sdfData: await response2D.text()}; // Return 2D SDF data
+    } else {
+      throw new Error("Error fetching SDF data from PubChem (both 3D and 2D unavailable).");
+    }
+  } catch (error) {
+    console.error("Error fetching SDF data from PubChem:", error);
+    return { sdfData: null};
+  }
+};
+
 
 
 // Fetch molecule details (name, formula, etc.) from PubChem
