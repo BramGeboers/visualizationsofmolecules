@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import { mobiusScalingTransform } from "@/utils/transformation";
 import * as THREE from "three";
 
 interface BondProps {
@@ -7,21 +8,9 @@ interface BondProps {
   type: number; // 1 for single, 2 for double, 3 for triple, etc.
   L: number; // Add L property
   P: { x: number; y: number; z: number }; // Add P property
-  mobiusScalingTransform: (
-    point: { x: number; y: number; z: number },
-    P: { x: number; y: number; z: number },
-    L: number
-  ) => { x: number; y: number; z: number };
 }
 
-const BondModel: React.FC<BondProps> = ({
-  start,
-  end,
-  type,
-  L,
-  P,
-  mobiusScalingTransform,
-}) => {
+const BondModel: React.FC<BondProps> = ({ start, end, type, L, P }) => {
   // Apply Möbius transformation to both start and end positions
   const transformedStart = mobiusScalingTransform(
     { x: start[0], y: start[1], z: start[2] },

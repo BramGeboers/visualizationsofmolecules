@@ -28,6 +28,9 @@ export const ModelViewer: React.FC<{
   const [pos1, setPos1] = useState(false);
   const [pos2, setPos2] = useState(false);
   const [navActive, setNavActive] = useState(false);
+  const [isCheckedP, setIsCheckedP] = useState(true);
+  const [bondModel, setBondModel] = useState(false);
+  const [isCheckedOrigin, setIsCheckedOrigin] = useState(true);
 
   const [P_x, setP_x] = useState(1); // New state for the x-coordinate of the point P
   const [P_y, setP_y] = useState(0); // New state for the y-coordinate of the point P
@@ -88,12 +91,12 @@ export const ModelViewer: React.FC<{
     };
   };
 
-  const [isCheckedP, setIsCheckedP] = useState(true);
-
-  const [isCheckedOrigin, setIsCheckedOrigin] = useState(true);
-
   const handleToggleOrigin = () => {
     setIsCheckedOrigin((prev) => !prev);
+  };
+
+  const handleToggleBondModel = () => {
+    setBondModel((prev) => !prev);
   };
 
   const handleToggleP = () => {
@@ -167,6 +170,7 @@ export const ModelViewer: React.FC<{
             <MobiusSphereAtom
               key={index}
               center={[atom.x, atom.y, atom.z]}
+              radiusInput={bondModel ? 0.5 : 1.4}
               L={L}
               P={P}
               segments={40}
@@ -174,26 +178,28 @@ export const ModelViewer: React.FC<{
               onClick={() => handleClick({ x: atom.x, y: atom.y, z: atom.z })}
             />
           ))}
-          {/* {bonds.map((bond, index) => (
-            <BondModel
-              key={index}
-              start={[
-                centeredAtoms[bond.startAtomIndex].x,
-                centeredAtoms[bond.startAtomIndex].y,
-                centeredAtoms[bond.startAtomIndex].z,
-              ]}
-              end={[
-                centeredAtoms[bond.endAtomIndex].x,
-                centeredAtoms[bond.endAtomIndex].y,
-                centeredAtoms[bond.endAtomIndex].z,
-              ]}
-              L={L}
-              P={P}
-              type={bond.type}
-              mobiusScalingTransform={mobiusScalingTransform}
-            />
-          ))} */}
-          {/* <OrbitControls /> */}
+          {bondModel && (
+            <>
+              {bonds.map((bond, index) => (
+                <BondModel
+                  key={index}
+                  start={[
+                    centeredAtoms[bond.startAtomIndex].x,
+                    centeredAtoms[bond.startAtomIndex].y,
+                    centeredAtoms[bond.startAtomIndex].z,
+                  ]}
+                  end={[
+                    centeredAtoms[bond.endAtomIndex].x,
+                    centeredAtoms[bond.endAtomIndex].y,
+                    centeredAtoms[bond.endAtomIndex].z,
+                  ]}
+                  L={L}
+                  P={P}
+                  type={bond.type}
+                />
+              ))}
+            </>
+          )}
         </Canvas>
       </div>
 
@@ -398,6 +404,23 @@ export const ModelViewer: React.FC<{
             <div
               className={`absolute top-0 left-0 w-6 h-6 bg-white border-[1px] rounded-md transition-all duration-200 ${
                 isCheckedOrigin
+                  ? "transform translate-x-6 border-[#4AC585]"
+                  : "border-[#242424]"
+              }`}
+            />
+          </div>
+        </div>
+        <div className="text-[#111111] bg-[#DBD8D5] rounded-md justify-between flex flex-row p-4">
+          Bond Model
+          <div
+            className={`relative inline-block w-12 h-6 rounded-md transition-all duration-200 ${
+              bondModel ? "bg-[#4AC585]" : "bg-[#242424]"
+            }`}
+            onClick={handleToggleBondModel}
+          >
+            <div
+              className={`absolute top-0 left-0 w-6 h-6 bg-white border-[1px] rounded-md transition-all duration-200 ${
+                bondModel
                   ? "transform translate-x-6 border-[#4AC585]"
                   : "border-[#242424]"
               }`}
