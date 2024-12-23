@@ -30,6 +30,7 @@ const Index: React.FC = () => {
     setL(initialL);
     setXPosition(initialXPosition);
     setYPosition(initialYPosition);
+    setCircle(initialCircle);
   };
 
   // Function to apply zoom (composite zoom logic)
