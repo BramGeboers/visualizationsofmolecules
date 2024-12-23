@@ -14,42 +14,39 @@ const Index: React.FC = () => {
   const initialL = 0;
   const initialXPosition = 1.5;
   const initialYPosition = 0;
-  const initialCircle = { center: [0, 0], radius: 1 }; // Initial circle properties
-
+  const initialCircles = [
+    { center: [0, 0], radius: 1 },
+    { center: [2, 2], radius: 1.5 },
+    { center: [-2, -2], radius: 1 },
+  ];
   const [L, setL] = useState(initialL);
   const [xPosition, setXPosition] = useState(initialXPosition);
   const [yPosition, setYPosition] = useState(initialYPosition);
-  const [circumcenter, setCircumcenter] = useState({ x: 0, y: 0 });
-  const [radius, setRadius] = useState(0);
-  const [circle, setCircle] = useState(initialCircle); // Transformed circle
+  const [circles, setCircles] = useState(initialCircles); // Transformed circle
+  const circle2DRefs = useRef<any[]>([]);
 
-  // console.log(circumcenter.x, circumcenter.y, radius);
+  // Function to apply zoom (composite zoom logic)
+  const applyZoom = () => {
+    // Loop through all circle refs and call applyZoom on each one
+    circle2DRefs.current.forEach((circleRef) => {
+      if (circleRef) {
+        circleRef.applyZoom(); // Call applyZoom in Circle2D
+      }
+    });
+    setL(0); // Reset L for incremental zooms
+  };
 
-  // Function to reset all values
   const resetValues = () => {
     setL(initialL);
     setXPosition(initialXPosition);
     setYPosition(initialYPosition);
-    setCircle(initialCircle);
-  };
-
-  // Function to apply zoom (composite zoom logic)
-  const applyZoom = () => {
-    const newCircle = {
-      center: [circumcenter.x, circumcenter.y], // Center remains the same
-      radius: radius, // Updated radius
-    };
-    setCircle(newCircle); // Save the new transformed state
+    // Loop through all circle refs and call applyReset on each one
+    circle2DRefs.current.forEach((circleRef) => {
+      if (circleRef) {
+        circleRef.applyReset(); // Call applyReset in Circle2D
+      }
+    });
     setL(0); // Reset L for incremental zooms
-  };
-
-  const handleUpdate = (
-    newCircumcenter: { x: number; y: number },
-    newRadius: number
-  ) => {
-    // Update the state with new values
-    setCircumcenter(newCircumcenter);
-    setRadius(newRadius);
   };
 
   const P = { x: xPosition, y: yPosition, z: 0 };
@@ -64,30 +61,20 @@ const Index: React.FC = () => {
         style={{ height: "100vh", width: "100%" }}
         camera={{ position: [0, 0, 10], zoom: 40 }}
       >
-        <Circle2D
-          radius={circle.radius}
-          segments={1024}
-          center={[circle.center[0], circle.center[1]]}
-          L={L}
-          P={P}
-          color="blue"
-          onUpdate={handleUpdate} // Pass the update function here
-        />
-        {/* <Circle2D
-          radius={radius}
-          segments={1024}
-          center={[3, 0]}
-          L={L}
-          P={P}
-          color="gray"
-          onUpdate={handleUpdate} // Pass the update function here
-        /> */}
-        {/* <CircleUnaffected
-          radius={1.5}
-          segments={1024}
-          center={[1.5, 0]}
-          color="red"
-        /> */}
+        {circles.map((circle, index) => (
+          <Circle2D
+            key={index}
+            ref={(el: HTMLDivElement | null) => {
+              circle2DRefs.current[index] = el;
+            }} // Assign unique ref to each circle
+            radius={circle.radius}
+            segments={1024}
+            center={[circle.center[0], circle.center[1]]}
+            L={L}
+            P={P}
+            color="blue"
+          />
+        ))}
         <MobiusPlane
           L={L}
           P={P}
@@ -99,23 +86,6 @@ const Index: React.FC = () => {
         <directionalLight position={[5, 5, 5]} intensity={1} />
         <PointSphere x={xPosition} y={yPosition} z={0} color="blue" />
         <PointSphere x={0} y={0} z={0} color="orange" />
-        {/* Generate spheres along the blue circle's radius */}
-        {Array.from({ length: segments }).map((_, i) => {
-          const angle = (i / segments) * Math.PI * 2;
-          const x = circle.center[0] - circle.radius * Math.cos(angle);
-          const y = circle.center[1] - circle.radius * Math.sin(angle);
-          return (
-            <TransformedPointSphere key={i} x={x} y={y} z={0} P={P} L={L} />
-          );
-        })}
-        {/* Text labels */}
-        {/* <Text position={[-3, 3, 0]} fontSize={0.5} color="black">
-          Original
-        </Text>
-        <Text position={[3, 3, 0]} fontSize={0.5} color="black">
-          Scaled
-        </Text> */}
-        {/* <axesHelper /> */}
         <OrbitControls
           enableRotate={false} // Disable rotation
           enableZoom={true} // Disable zoom (optional, if needed)
