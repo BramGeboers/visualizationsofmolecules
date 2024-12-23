@@ -66,9 +66,20 @@ const TransformedPointSphere: React.FC<{
 
 // Main Index component to render both the original and transformed images side-by-side
 const Index: React.FC = () => {
-  const [L, setL] = useState(0);
-  const [xPosition, setXPosition] = useState(1.5);
-  const [yPosition, setYPosition] = useState(0);
+  const initialL = 0;
+  const initialXPosition = 1.5;
+  const initialYPosition = 0;
+
+  const [L, setL] = useState(initialL);
+  const [xPosition, setXPosition] = useState(initialXPosition);
+  const [yPosition, setYPosition] = useState(initialYPosition);
+
+  // Function to reset all values
+  const resetValues = () => {
+    setL(initialL);
+    setXPosition(initialXPosition);
+    setYPosition(initialYPosition);
+  };
 
   const P = { x: xPosition, y: yPosition, z: 0 };
 
@@ -90,7 +101,6 @@ const Index: React.FC = () => {
           L={L}
           P={P}
           color="blue"
-          mobiusScalingTransform={mobiusScalingTransform}
         />
         <Circle2D
           radius={radius}
@@ -99,7 +109,6 @@ const Index: React.FC = () => {
           L={L}
           P={P}
           color="gray"
-          mobiusScalingTransform={mobiusScalingTransform}
         />
         {/* <CircleUnaffected
           radius={1.5}
@@ -141,6 +150,12 @@ const Index: React.FC = () => {
       </Canvas>
       <div className="fixed bottom-0 p-2 rounded-lg flex justify-center w-full text-[#111111]">
         <div className="flex lg:flex-row flex-col lg:gap-12 gap-2">
+          <button
+            className="rounded-md bg-[#4AC585] hover:bg-[#3faa73] h-[80px] transition-all duration-200 text-[#111111] p-1 px-3 font-bold text-lg uppercase"
+            onClick={resetValues}
+          >
+            Reset
+          </button>
           <div className="bg-[#DBD8D5] p-4 flex flex-col rounded-md lg:mb-12 mb-3 items-center ">
             <div className="flex justify-between w-full max-w-[300px]">
               <span className="mb-2 flex between">Zoom</span>
