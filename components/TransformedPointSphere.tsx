@@ -1,14 +1,11 @@
+import { mobiusScalingTransform } from "@/utils/transformation";
+
 interface TransformedPointSphereProps {
   x: number;
   y: number;
   z: number;
   P: { x: number; y: number; z: number };
   L: number;
-  mobiusScalingTransform: (
-    point: { x: number; y: number; z: number },
-    P: { x: number; y: number; z: number },
-    L: number
-  ) => { x: number; y: number; z: number };
 }
 
 const TransformedPointSphere: React.FC<TransformedPointSphereProps> = ({
@@ -17,7 +14,6 @@ const TransformedPointSphere: React.FC<TransformedPointSphereProps> = ({
   z,
   P,
   L,
-  mobiusScalingTransform,
 }) => {
   const transformed = mobiusScalingTransform({ x: x, y: y, z: z }, P, L);
   return (

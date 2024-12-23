@@ -25,6 +25,7 @@ const Circle2D: React.FC<Circle2DProps> = ({
   onUpdate, // Callback prop to pass back the circumcenter and radius
 }) => {
   const circleRef = useRef<THREE.Line>(null);
+  const sphereRef = useRef<THREE.Mesh>(null);
   const [centerX, centerY] = center;
 
   // Generate transformed circle points using the Möbius transformation
@@ -78,6 +79,12 @@ const Circle2D: React.FC<Circle2DProps> = ({
   const dx = p1.x - circumcenter.x;
   const dy = p1.y - circumcenter.y;
   const radiusFromCenter = Math.sqrt(dx * dx + dy * dy);
+
+  // Log the circumcenter and radius
+  useEffect(() => {
+    console.log("Circumcenter:", circumcenter);
+    console.log("Radius:", radiusFromCenter);
+  }, [circumcenter, radiusFromCenter]);
 
   // Create geometry from transformed points
   const geometry = new THREE.BufferGeometry().setFromPoints(

@@ -1,13 +1,12 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
-import * as THREE from "three";
-import { OrbitControls, Text } from "@react-three/drei";
+import { OrbitControls } from "@react-three/drei";
 import Navbar from "@/components/Navbar";
-import Circle2D from "@/components/Circle2D";
+import Circle2D from "@/components/Circle2D copy";
+import MobiusPlane from "@/components/MobiusPlane";
 import PointSphere from "@/components/PointSphere";
 import TransformedPointSphere from "@/components/TransformedPointSphere";
-import MobiusPlane from "@/components/MobiusPlane";
 
 // Main Index component to render both the original and transformed images side-by-side
 const Index: React.FC = () => {
@@ -16,21 +15,23 @@ const Index: React.FC = () => {
   const initialYPosition = 0;
   const initialCircle = { center: [0, 0], radius: 1 }; // Initial circle properties
 
+  const [circumcenter, setCircumcenter] = useState({ x: 0, y: 0 });
+  const [radius, setRadius] = useState(0);
+
+  const handleUpdate = (
+    newCircumcenter: { x: number; y: number },
+    newRadius: number
+  ) => {
+    // Update the state with new values
+    setCircumcenter(newCircumcenter);
+    setRadius(newRadius);
+  };
+
   const [L, setL] = useState(initialL);
   const [xPosition, setXPosition] = useState(initialXPosition);
   const [yPosition, setYPosition] = useState(initialYPosition);
-  const [circumcenter, setCircumcenter] = useState({ x: 0, y: 0 });
-  const [radius, setRadius] = useState(0);
   const [circle, setCircle] = useState(initialCircle); // Transformed circle
-
-  // console.log(circumcenter.x, circumcenter.y, radius);
-
-  // Function to reset all values
-  const resetValues = () => {
-    setL(initialL);
-    setXPosition(initialXPosition);
-    setYPosition(initialYPosition);
-  };
+  const [temporaryL, setTemporaryL] = useState(initialL); // Temporary zoom before committing
 
   // Function to apply zoom (composite zoom logic)
   const applyZoom = () => {
@@ -40,15 +41,14 @@ const Index: React.FC = () => {
     };
     setCircle(newCircle); // Save the new transformed state
     setL(0); // Reset L for incremental zooms
+    setTemporaryL(0); // Reset temporary zoom
   };
 
-  const handleUpdate = (
-    newCircumcenter: { x: number; y: number },
-    newRadius: number
-  ) => {
-    // Update the state with new values
-    setCircumcenter(newCircumcenter);
-    setRadius(newRadius);
+  // Function to reset to the initial circle
+  const resetValues = () => {
+    setCircle(initialCircle); // Reset to the initial circle
+    setL(initialL);
+    setTemporaryL(initialL);
   };
 
   const P = { x: xPosition, y: yPosition, z: 0 };
@@ -72,15 +72,14 @@ const Index: React.FC = () => {
           color="blue"
           onUpdate={handleUpdate} // Pass the update function here
         />
-        {/* <Circle2D
+        <Circle2D
           radius={radius}
           segments={1024}
           center={[3, 0]}
           L={L}
           P={P}
           color="gray"
-          onUpdate={handleUpdate} // Pass the update function here
-        /> */}
+        />
         {/* <CircleUnaffected
           radius={1.5}
           segments={1024}
@@ -101,8 +100,8 @@ const Index: React.FC = () => {
         {/* Generate spheres along the blue circle's radius */}
         {Array.from({ length: segments }).map((_, i) => {
           const angle = (i / segments) * Math.PI * 2;
-          const x = circle.center[0] - circle.radius * Math.cos(angle);
-          const y = circle.center[1] - circle.radius * Math.sin(angle);
+          const x = initialCircle.radius * Math.cos(angle);
+          const y = initialCircle.radius * Math.sin(angle);
           return (
             <TransformedPointSphere key={i} x={x} y={y} z={0} P={P} L={L} />
           );
