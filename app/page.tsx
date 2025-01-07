@@ -66,7 +66,7 @@ const Index: React.FC = () => {
 
         <div className="flex flex-row justify-between gap-4 w-[80%] sm:w-[600px] lg:w-[700px]">
           <p className="flex flex-row">
-            <span className="mr-8 lg:block hidden">02. </span> 3D Transformation
+            <span className="mr-8 lg:block hidden">03. </span> 3D Transformation
             on Spheres
           </p>
           <Link href="/third">
@@ -78,7 +78,7 @@ const Index: React.FC = () => {
 
         <div className="flex flex-row justify-between gap-4 w-[80%] sm:w-[600px] lg:w-[700px]">
           <p className="flex flex-row">
-            <span className="mr-8 lg:block hidden">03. </span> 3D Transformation
+            <span className="mr-8 lg:block hidden">04. </span> 3D Transformation
             on Molecules{" "}
           </p>
           <Link href="/fourth">

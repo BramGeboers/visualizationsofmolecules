@@ -8,6 +8,7 @@ import Circle2D from "@/components/Circle2D";
 import PointSphere from "@/components/PointSphere";
 import TransformedPointSphere from "@/components/TransformedPointSphere";
 import MobiusPlane from "@/components/MobiusPlane";
+import { color } from "three/webgpu";
 
 // Main Index component to render both the original and transformed images side-by-side
 const Index: React.FC = () => {
@@ -15,9 +16,9 @@ const Index: React.FC = () => {
   const initialXPosition = 1.5;
   const initialYPosition = 0;
   const initialCircles = [
-    { center: [0, 0], radius: 1 },
-    { center: [2, 2], radius: 1.5 },
-    { center: [-2, -2], radius: 1 },
+    { center: [0, 0], radius: 1, color: "blue" },
+    { center: [2, 2], radius: 1.5, color: "green" },
+    { center: [-2, -2], radius: 1, color: "red" },
   ];
   const [L, setL] = useState(initialL);
   const [xPosition, setXPosition] = useState(initialXPosition);
@@ -72,7 +73,7 @@ const Index: React.FC = () => {
             center={[circle.center[0], circle.center[1]]}
             L={L}
             P={P}
-            color="blue"
+            color={circle.color}
           />
         ))}
         <MobiusPlane
@@ -94,18 +95,20 @@ const Index: React.FC = () => {
       </Canvas>
       <div className="fixed bottom-0 p-2 rounded-lg flex justify-center w-full text-[#111111]">
         <div className="flex lg:flex-row flex-col lg:gap-12 gap-2">
-          <button
-            className="rounded-md bg-[#4AC585] hover:bg-[#3faa73] h-[80px] transition-all duration-200 text-[#111111] p-1 px-3 font-bold text-lg uppercase"
-            onClick={applyZoom}
-          >
-            Apply Zoom
-          </button>
-          <button
-            className="rounded-md bg-[#4AC585] hover:bg-[#3faa73] h-[80px] transition-all duration-200 text-[#111111] p-1 px-3 font-bold text-lg uppercase"
-            onClick={resetValues}
-          >
-            Reset
-          </button>
+          <div className="flex flex-col gap-2">
+            <button
+              className="rounded-md bg-[#4AC585] hover:bg-[#3faa73] transition-all duration-200 text-[#111111] p-1 px-3 font-bold text-lg uppercase"
+              onClick={applyZoom}
+            >
+              Apply Zoom
+            </button>
+            <button
+              className="rounded-md bg-[#4AC585] hover:bg-[#3faa73] transition-all duration-200 text-[#111111] p-1 px-3 font-bold text-lg uppercase"
+              onClick={resetValues}
+            >
+              Reset
+            </button>
+          </div>
           <div className="bg-[#DBD8D5] p-4 flex flex-col rounded-md lg:mb-12 mb-3 items-center ">
             <div className="flex justify-between w-full max-w-[300px]">
               <span className="mb-2 flex between">Zoom</span>

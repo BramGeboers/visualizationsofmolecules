@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { Atom, Bond } from "@/utils/parseSDF";
@@ -14,9 +14,13 @@ export const ModelViewer2D: React.FC<{
   moleculeName: string;
   moleculeFormula: string;
 }> = ({ atoms, bonds, moleculeName, moleculeFormula }) => {
-  const [L, setL] = useState(0);
-  const [xPosition, setXPosition] = useState(0);
-  const [yPosition, setYPosition] = useState(0);
+  const initialL = 0;
+  const initialXPosition = 1.5;
+  const initialYPosition = 0;
+
+  const [L, setL] = useState(initialL);
+  const [xPosition, setXPosition] = useState(initialXPosition);
+  const [yPosition, setYPosition] = useState(initialYPosition);
   const [zPosition, setZPosition] = useState(0); // New Z position state
   const [pos1, setPos1] = useState(false);
   const [pos2, setPos2] = useState(false);
@@ -79,6 +83,32 @@ export const ModelViewer2D: React.FC<{
       y: totalY / numAtoms,
       z: totalZ / numAtoms,
     };
+  };
+
+  const circle2DRefs = useRef<any[]>([]);
+
+  // Function to apply zoom (composite zoom logic)
+  const applyZoom = () => {
+    // Loop through all circle refs and call applyZoom on each one
+    circle2DRefs.current.forEach((circleRef) => {
+      if (circleRef) {
+        circleRef.applyZoom(); // Call applyZoom in Circle2D
+      }
+    });
+    setL(0); // Reset L for incremental zooms
+  };
+
+  const resetValues = () => {
+    setL(initialL);
+    setXPosition(initialXPosition);
+    setYPosition(initialYPosition);
+    // Loop through all circle refs and call applyReset on each one
+    circle2DRefs.current.forEach((circleRef) => {
+      if (circleRef) {
+        circleRef.applyReset(); // Call applyReset in Circle2D
+      }
+    });
+    setL(0); // Reset L for incremental zooms
   };
 
   const [isCheckedP, setIsCheckedP] = useState(true);
@@ -150,6 +180,9 @@ export const ModelViewer2D: React.FC<{
             <Disk2D
               key={index}
               center={[atom.x, atom.y, atom.z]}
+              ref={(el: HTMLDivElement | null) => {
+                circle2DRefs.current[index] = el;
+              }} // Assign unique ref to each circle
               L={L}
               P={P}
               segments={256}
@@ -200,7 +233,7 @@ export const ModelViewer2D: React.FC<{
           navActive ? "translate-x-full" : "translate-x-0"
         }`}
       >
-        <div className="bg-[#DBD8D5] p-4 flex flex-col rounded-md mb-12 items-center ">
+        <div className="bg-[#DBD8D5] p-4 flex flex-col rounded-md items-center ">
           <div className="flex justify-between w-full max-w-[300px]">
             <span className="mb-2 flex between">Zoom</span>
             <span>{(parseFloat(L.toFixed(3)) * 100).toFixed(1)}%</span>
@@ -234,6 +267,19 @@ export const ModelViewer2D: React.FC<{
             }
           `}</style>
         </div>
+
+        <button
+          className="rounded-md bg-[#4AC585] hover:bg-[#3faa73] transition-all duration-200 text-[#111111] p-1 px-3 font-bold text-lg uppercase"
+          onClick={applyZoom}
+        >
+          Apply Zoom
+        </button>
+        <button
+          className="rounded-md bg-[#4AC585] hover:bg-[#3faa73] mb-12 transition-all duration-200 text-[#111111] p-1 px-3 font-bold text-lg uppercase"
+          onClick={resetValues}
+        >
+          Reset
+        </button>
 
         <div className="bg-[#DBD8D5] p-4 flex flex-col rounded-md items-center">
           {[
