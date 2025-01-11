@@ -43,6 +43,9 @@ const Home: React.FC = () => {
     try {
       // Attempt fetching from PubChem
       const pubChemResult = await fetchMolecule3D(searchValue);
+      if (pubChemResult.is2D) {
+        setIs2D(true);
+      }
       sdfData = pubChemResult.sdfData;
       details = await fetchMoleculeDetails(searchValue);
 
